@@ -3,24 +3,31 @@
   background-color: #282c34;
   display: flex;
   flex-flow: row wrap;
-  width: 1024px;
+  // width: 1024px;
   align-items: flex-start;
   justify-content: center;
-  margin: auto;
+  margin: 0 auto;
   font-size: calc(10px + 2vmin);
   color: white;
+  padding: 10px 0 0;
 
+  
   .img-wrapper {
     display: flex;
-    width: 30%;
+    width: calc(33% - 40px);
     margin: 0 10px;
     flex-flow: column wrap;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    height: 100%;
   }
-
+  
   img {
     width: 100%;
     margin: 10px;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 15px 17px 0 0;
   }
 }
