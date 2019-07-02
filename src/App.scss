@@ -1,7 +1,6 @@
 .App {
     background-color: #282c34;
-    font-size: calc(10px + 2vmin);
-    color: white;
+ 
     
     
     .img-container {
@@ -30,7 +29,7 @@
     }
 
   
-
+    // Accounts for scroll wheel on desktop.
     @media (min-width: 768px) {
         .img-container {
             padding: 15px 17px 0 0;
