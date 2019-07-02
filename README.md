@@ -2,8 +2,9 @@
 
 A giphy-style image viewer. Add your images and keep your own local image file server.
 
+![An example of the site](https://github.com/hugocowan/image-viewer/master/src/assets/Stock/image-viewer.png)
 
-![An example of the site](./src/assets/Stock/image-viewer.png)
+<!-- ![An example of the site](./src/assets/Stock/image-viewer.png) -->
 
 ## Instructions for use:
 
