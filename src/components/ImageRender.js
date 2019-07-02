@@ -14,9 +14,10 @@ class ImageRender extends React.Component {
             columns: [
                 props.images.slice(0, oneThird),
                 props.images.slice(oneThird, twoThirds),
-                props.images.slice(twoThirds, props.images.length - 1)
+                props.images.slice(twoThirds)
             ],
-            sorted: false,  
+            sorted: false,
+            loadedImages: 0,
         };
 
         // Declare colHeight vars here so they can be referenced anywhere.
@@ -36,12 +37,14 @@ class ImageRender extends React.Component {
     // Once the columns are leveled out, set state with the new column arrays.
     onImgLoad = () => {
 
-        const _this = this, columns = [ this.col0.children, this.col1.children, this.col2.children ];
+        let loadedImages = this.state.loadedImages;
 
-        setTimeout(() => {
+        if (loadedImages + 1 === this.props.images.length) {
+
+            const _this = this, columns = [ this.col0.children, this.col1.children, this.col2.children ];
 
             // Make a copy of the image columns, initialise other vars.
-            let [ col0, col1, col2 ] = [ ..._this.state.columns ],
+            let [ col0, col1, col2 ] = [ ...this.state.columns ],
                 maxHeight = 0,
                 col0Heights = [],
                 col1Heights = [],
@@ -60,23 +63,23 @@ class ImageRender extends React.Component {
             });
             
             // Get the current height of each column by adding up the image heights.
-            _this.col0Height = col0Heights.reduce((a, b) => a + b);
-            _this.col1Height = col1Heights.reduce((a, b) => a + b);
-            _this.col2Height = col2Heights.reduce((a, b) => a + b);
+            this.col0Height = col0Heights.reduce((a, b) => a + b);
+            this.col1Height = col1Heights.reduce((a, b) => a + b);
+            this.col2Height = col2Heights.reduce((a, b) => a + b);
 
             // While diff between columns > max image height, keep moving images.
-            while ( Math.abs(_this.col0Height - _this.col1Height) > maxHeight ||
-                    Math.abs(_this.col1Height - _this.col2Height) > maxHeight ||
-                    Math.abs(_this.col2Height - _this.col0Height) > maxHeight  ) 
+            while ( Math.abs(this.col0Height - this.col1Height) > maxHeight ||
+                    Math.abs(this.col1Height - this.col2Height) > maxHeight ||
+                    Math.abs(this.col2Height - this.col0Height) > maxHeight  ) 
             {
                 // Find the largest column to take an image from.
-                switch(Math.max(_this.col0Height, _this.col1Height, _this.col2Height)) {
+                switch(Math.max(this.col0Height, this.col1Height, this.col2Height)) {
 
-                    case _this.col0Height: 
+                    case this.col0Height: 
                         findSmallestColumn(col0, col0Heights, 'col0Height');
                         break;
 
-                    case _this.col1Height: 
+                    case this.col1Height: 
                         findSmallestColumn(col1, col1Heights, 'col1Height');
                         break;
 
@@ -115,9 +118,13 @@ class ImageRender extends React.Component {
             }
 
             // Set state with the finalised column arrays.
-            _this.setState({ columns: [ col0, col1, col2 ], sorted: true });
+            this.setState({ columns: [ col0, col1, col2 ] });
 
-        }, 1000);
+        } else {
+
+            this.setState({ loadedImages: loadedImages + 1 }); 
+        
+        }
     }
 
     render() {
@@ -132,7 +139,7 @@ class ImageRender extends React.Component {
                                 key={imageLink}
                                 alt={`From ${imageLink}`}
                                 src={require(`../assets/${imageLink}`)}
-                                onLoad={() => !this.state.sorted && i === 2 && index === arr.length - 1 && this.onImgLoad()}
+                                onLoad={this.onImgLoad}
                             />
                         )}
                 </div>})}
