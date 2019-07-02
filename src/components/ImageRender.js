@@ -1,4 +1,5 @@
 import React from 'react';
+import Modal from './Modal';
 
 class ImageRender extends React.Component {
 
@@ -18,6 +19,7 @@ class ImageRender extends React.Component {
             ],
             sorted: false,
             loadedImages: 0,
+            selectedImage: '',
         };
 
         // Declare colHeight vars here so they can be referenced anywhere.
@@ -130,19 +132,28 @@ class ImageRender extends React.Component {
     render() {
 
         return (
-            <div className='img-container'>
-                {this.state.columns.map((col, i) => {
+            <div>
+                {this.state.selectedImage && 
+                <Modal 
+                    imageLink={this.state.selectedImage}
+                    onClick ={() => this.setState({ selectedImage: '' })}
+                
+                />}
+                <div className='img-container'>
+                    {this.state.columns.map((col, i) => {
 
-                    return <div key={col} className='img-wrapper' ref={c => this[`col${i}`] = c}>
-                        {col.map((imageLink, index, arr) =>
-                            <img
-                                key={imageLink}
-                                alt={`From ${imageLink}`}
-                                src={require(`../assets/${imageLink}`)}
-                                onLoad={this.onImgLoad}
-                            />
-                        )}
-                </div>})}
+                        return <div key={col} className='img-wrapper' ref={c => this[`col${i}`] = c}>
+                            {col.map((imageLink, index, arr) =>
+                                <img
+                                    key={imageLink}
+                                    alt={`From ${imageLink}`}
+                                    src={require(`../assets/${imageLink}`)}
+                                    onLoad={this.onImgLoad}
+                                    onClick={() => this.setState({ selectedImage: imageLink })}
+                                />
+                            )}
+                    </div>})}
+                </div>
             </div>
         );
     }
