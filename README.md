@@ -2,7 +2,7 @@
 
 A giphy-style image viewer. Add your images and keep your own local image file server.
 
-![An example of the site](./src/assets/example/image-viewer.png)
+![An example of the site](./public/image-viewer.png)
 
 ## Instructions for use:
 
