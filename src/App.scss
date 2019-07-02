@@ -9,13 +9,17 @@
         flex-flow: row wrap;
         align-items: flex-start;
         justify-content: center;
-        padding: 10px 5px;
+        padding: 5px;
         margin: 0 auto;
         
         img {
             width: 100%;
             margin: 10px 0;
             display: border-box;
+
+            &:first-child {
+                margin: 0 0 10px;
+            }
         }
 
         .img-wrapper {
@@ -42,7 +46,8 @@
         background: rgba(0, 0, 0, 0.5);
 
         img {
-            max-height: 95%;
+            max-height: 100%;
+            max-width: 100%;
         }
     }
 
@@ -50,7 +55,7 @@
     // Accounts for scroll wheel on desktop.
     @media (min-width: 768px) {
         .img-container {
-            padding: 15px 17px 15px 17px;
+            padding: 17px;
 
             .img-wrapper {
                 width: calc(33% - 12px);
