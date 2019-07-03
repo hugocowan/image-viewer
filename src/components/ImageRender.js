@@ -1,5 +1,6 @@
 import React from 'react';
 import Modal from './Modal';
+import { Waypoint } from 'react-waypoint';
 
 class ImageRender extends React.Component {
 
@@ -29,6 +30,13 @@ class ImageRender extends React.Component {
         this.col0Height = 0;
         this.col1Height = 0;
         this.col2Height = 0;
+    }
+
+    componentDidMount() {
+
+        if (this.state.sorted) {
+
+        }
     }
 
     componentDidUpdate() {
@@ -155,6 +163,32 @@ class ImageRender extends React.Component {
         }
     }
 
+    handleEnter = (e, img, src) => {
+
+        if (this.state.sorted) {
+
+            console.log('Enter:', e, img);
+            img.src = require(`../assets/${src}`);
+        }
+    }
+
+    handleLeave = (e, img, src) => {
+
+        if (this.state.sorted) {
+            
+            console.log('Leave:', e, img);
+            img.src = `https://via.placeholder.com/${img.clientWidth}x${img.clientHeight || 100}.png/282c34/282c34`;
+        }
+    }
+
+    Img = React.forwardRef((props, ref) => {
+        return <img
+            
+            
+            { ...props }
+        />
+    });
+
     render() {
 
         return (
@@ -170,13 +204,21 @@ class ImageRender extends React.Component {
 
                         return <div key={col} className='img-wrapper' ref={c => this[`col${i}`] = c}>
                             {col.map((imageLink, index, arr) =>
-                                <img
-                                    key={imageLink}
-                                    alt={`From ${imageLink}`}
-                                    src={require(`../assets/${imageLink}`)}
-                                    onLoad={this.onImgLoad}
-                                    onClick={() => this.setState({ selectedImage: imageLink })}
-                                />
+                                <Waypoint 
+                                    key={imageLink} 
+                                    onEnter={(e) => this.handleEnter(e, this[imageLink], imageLink)} 
+                                    onLeave={(e) => this.handleLeave(e, this[imageLink], imageLink)}
+                                    scrollableAncestor={window}
+                                    // debug={true}
+                                >
+                                    <img
+                                        ref={c => this[imageLink] = c}
+                                        alt={`From ${imageLink}`}
+                                        src={require(`../assets/${imageLink}`)}
+                                        onLoad={this.onImgLoad}
+                                        onClick={() => this.setState({ selectedImage: imageLink })}
+                                    />
+                                </Waypoint>
                             )}
                     </div>})}
                 </div>

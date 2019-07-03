@@ -36,7 +36,7 @@ class App extends React.Component {
                 this.setState({ isLoading: true, imageLimit: imageLimit + 33 });
             }
             
-        }, 500);
+        }, 250);
     }
 
     componentDidUpdate() {
@@ -115,9 +115,9 @@ class App extends React.Component {
                     setIsLoading = {this.setIsLoading}
                     isLoading = {this.state.isLoading}
                 />
-                {this.state.isLoading && <div>
+                {/* {this.state.isLoading && <div>
                     Loading...
-                </div>}
+                </div>} */}
             </div>
         );
     }
