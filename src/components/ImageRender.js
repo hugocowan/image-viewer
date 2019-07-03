@@ -6,17 +6,20 @@ class ImageRender extends React.Component {
     constructor(props) {
         super(props);
 
-        const oneThird = Math.ceil((props.images.length - 1) / 3),
-            twoThirds = props.images.length - 1 - oneThird;
+        const columns = [ [], [], [] ];
+        
+        props.images.forEach((image, index) => {
+
+            // Split the image array into three equal columns
+            index % 3 === 0 ? columns[2].push(image) :
+            index % 2 === 0 ? columns[1].push(image) :
+                columns[0].push(image);
+
+        });
 
         this.state = {
 
-            // Split the image array into three equal columns
-            columns: [
-                props.images.slice(0, oneThird),
-                props.images.slice(oneThird, twoThirds),
-                props.images.slice(twoThirds)
-            ],
+            columns,
             sorted: false,
             loadedImages: 0,
             selectedImage: '',
@@ -26,6 +29,24 @@ class ImageRender extends React.Component {
         this.col0Height = 0;
         this.col1Height = 0;
         this.col2Height = 0;
+    }
+
+    componentDidUpdate() {
+
+        if (this.state.sorted && this.props.images.length > this.state.loadedImages) {
+            
+            const columns = [ ...this.state.columns ];
+            
+            this.props.images.slice(this.state.loadedImages).forEach((image, index) => {
+
+                index % 3 === 0 ? columns[2].push(image) :
+                index % 2 === 0 ? columns[1].push(image) :
+                columns[0].push(image);
+            });
+            
+
+            this.setState({ columns, sorted: false, loadedImages: 0 });
+        }
     }
     
     // Ensure image column heights <= biggest image height:
@@ -41,7 +62,8 @@ class ImageRender extends React.Component {
 
         let loadedImages = this.state.loadedImages;
 
-        if (loadedImages + 1 === this.props.images.length) {
+        
+        if (!this.state.sorted && loadedImages + 1 === this.props.images.length) {
 
             const _this = this, columns = [ this.col0.children, this.col1.children, this.col2.children ];
 
@@ -120,11 +142,15 @@ class ImageRender extends React.Component {
             }
 
             // Set state with the finalised column arrays.
-            this.setState({ columns: [ col0, col1, col2 ] });
+            this.props.setIsLoading(false);
+            this.setState({ columns: [ col0, col1, col2 ], loadedImages: loadedImages + 1, sorted: true });
 
         } else {
 
-            this.setState({ loadedImages: loadedImages + 1 }); 
+            if (loadedImages < this.props.images.length) {
+                this.props.setIsLoading(true);
+                this.setState({ loadedImages: loadedImages + 1 });
+            }
         
         }
     }

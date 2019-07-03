@@ -1,6 +1,7 @@
 .App {
     background-color: #282c34;
     min-height: 100vh;
+    overflow-x: hidden;
  
     
     
@@ -14,11 +15,11 @@
         
         img {
             width: 100%;
-            margin: 10px 0;
+            margin: 5px 0;
             display: border-box;
 
             &:first-child {
-                margin: 0 0 10px;
+                margin: 0 0 5px;
             }
         }
 
@@ -56,6 +57,16 @@
     @media (min-width: 768px) {
         .img-container {
             padding: 17px;
+            
+            img {
+                width: 100%;
+                margin: 10px 0;
+                display: border-box;
+    
+                &:first-child {
+                    margin: 0 0 10px;
+                }
+            }
 
             .img-wrapper {
                 width: calc(33% - 12px);
