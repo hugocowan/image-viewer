@@ -2,6 +2,103 @@
     background-color: #282c34;
     min-height: 100vh;
     overflow-x: hidden;
+
+    nav {
+        height: 47px;
+        overflow: none;
+        font-size: 14px;
+
+        .burger {
+            cursor: pointer;
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            left: 0;
+            z-index: 1;
+            text-align: center;
+        
+            div {
+                width: 3px;
+                height: 29px;
+                left: 20px;
+                position: absolute;
+                background: #000000;
+                transform: rotate(90deg);
+                margin: 0 0 -20px;
+                border-radius: 3px;
+                transition: ease 1s;
+
+                &:first-child {
+                    top: 0;
+                }
+
+                &:nth-child(2) {
+                    top: 9px;
+                }
+                
+                &:last-child {
+                    top: 18px;
+                }
+
+            }
+
+            &.true {
+
+                div {
+
+                    &:first-child {
+                        transform: rotate(45deg);
+                        top: 9px;
+                    }
+
+                    &:nth-child(2) {
+                        transform: rotate(-45deg);
+                    }
+                    
+                    &:last-child {
+                        display: none;
+                    }
+                }
+            }
+        }
+
+        ul {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            position: relative;
+            width: 96%;
+            height: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin: 0;
+
+            li {
+                text-align: center;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+                list-style-type: none;
+                color: #000000;
+                cursor: pointer;
+                font-weight: bold;
+
+                &.true {
+                    border-bottom: 2px #000000 solid;
+                }
+            }
+        }
+        
+        @media (min-width: 768px) {
+            font-size: 18px;
+
+            .burger {
+                div {
+                    width: 3px;
+                    height: 29px;
+                    left: 30px;
+                }
+            }
+        }
+    }
  
     
     
@@ -56,7 +153,7 @@
     // Accounts for scroll wheel on desktop.
     @media (min-width: 768px) {
         .img-container {
-            padding: 17px;
+            padding: 0 17px 17px;
             
             img {
                 width: 100%;

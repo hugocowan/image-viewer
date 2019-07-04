@@ -1,5 +1,6 @@
 import React from 'react';
 import ImageRender from './components/ImageRender';
+import Navbar from './components/Navbar';
 import './App.scss';
 
 class App extends React.Component {
@@ -11,6 +12,8 @@ class App extends React.Component {
             images: require.context('./assets', false, /\.(png|jpe?g|gif)$/)
                         .keys()
                         .map(imageLink => imageLink.replace('./', '')),
+            sortType: 'shuffle',
+            updateNeeded: false,
         };
 
         this.state.images = this.shuffle(this.state.images);
@@ -52,6 +55,30 @@ class App extends React.Component {
         return ax.length - bx.length;
     }
 
+    handleSortChange = (sortType) => {
+    
+        let images = [ ...this.state.images ];
+
+        switch(sortType) {
+            case 'shuffle' :
+                images = this.shuffle(images);
+                break;
+            
+            case 'natural' :
+                images.sort(this.naturalSort);
+                break;
+            
+            case 'naturalReverse' : 
+                images.sort(this.naturalSort).reverse();
+                break;
+
+            default: break;
+        }
+
+        this.setState({ sortType, images, updateNeeded: true });
+
+    }
+
     debounce = (func, wait) => {
         
         let timeout;
@@ -76,7 +103,16 @@ class App extends React.Component {
         
         return (
             <div className="App">
-                <ImageRender images = {this.state.images}/>
+                <Navbar 
+                    handleSortChange={this.handleSortChange} 
+                    sortType={this.state.sortType} 
+                />
+                <ImageRender 
+                    images={this.state.images} 
+                    handleSort={this.handleSort} 
+                    updateNeeded={this.state.updateNeeded}
+                    updateDone={() => this.setState({ updateNeeded: false })}
+                />
             </div>
         );
     }

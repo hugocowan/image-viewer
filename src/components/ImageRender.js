@@ -21,6 +21,7 @@ class ImageRender extends React.Component {
             sorted: false,
             loadedImages: 0,
             selectedImage: '',
+            sortType: props.sortType,
         };
 
         // Declare colHeight vars here so they can be referenced anywhere.
@@ -28,7 +29,27 @@ class ImageRender extends React.Component {
         this.col1Height = 0;
         this.col2Height = 0;
 
+        // Use the observer to keep track of each image's location
         this.observer = new IntersectionObserver(this.handleIntersection);
+    }
+
+    componentDidUpdate() {
+
+        if (!this.props.updateNeeded) return;
+
+        const columns = [ [], [], [] ];
+        
+        this.props.images.forEach((image, index) => {
+
+            // Split the image array into three equal columns
+            index % 3 === 0 ? columns[2].push(image) :
+            index % 2 === 0 ? columns[1].push(image) :
+                columns[0].push(image);
+        });
+        
+        this.props.updateDone();
+
+        this.setState({ columns, sortType: this.props.sortType });
     }
     
     // Ensure image column heights <= biggest image height:
@@ -42,30 +63,28 @@ class ImageRender extends React.Component {
     // Once the columns are leveled out, set state with the new column arrays.
     onImgLoad = ({ target }) => {
 
-        let { loadedImages } = this.state;
+        let { loadedImages, sorted, columns } = this.state, { images } = this.props;
 
         this.observer.observe(target);
         
-        if (!this.state.sorted && loadedImages + 1 === this.props.images.length) {
+        if (!sorted && loadedImages + 1 === images.length) {
 
-            const _this = this, columns = [ this.col0.children, this.col1.children, this.col2.children ];
+            // Make a copy of the image column arrays, initialise other vars.
+            const columnChildren = [ this.col0.children, this.col1.children, this.col2.children ];
 
-            // Make a copy of the image columns, initialise other vars.
-            let [ col0, col1, col2 ] = [ ...this.state.columns ],
-                maxHeight = 0,
-                col0Heights = [],
-                col1Heights = [],
-                col2Heights = [];
+            let [ col0, col1, col2 ] = [ ...columns ],
+            col0Heights = [], col1Heights = [], col2Heights = [],
+            maxHeight = 0;
             
-            // Get individual image sizes for each column array, in order. Also get max image height.
-            columns.forEach((col, index) => {
-                for (let i = 0; i < col.length; i++) {
+            // Get individual image sizes from each column's HTMLCollection of images, in order. Also get max image height.
+            columnChildren.forEach((column, i) => {
+                for (let j = 0; j < column.length; j++) {
                     
-                    index === 0 ? col0Heights.push(col[i].clientHeight) :
-                    index === 1 ? col1Heights.push(col[i].clientHeight) :
-                        col2Heights.push(col[i].clientHeight);
+                    i === 0 ? col0Heights.push(column[j].clientHeight) :
+                    i === 1 ? col1Heights.push(column[j].clientHeight) :
+                        col2Heights.push(column[j].clientHeight);
 
-                    if (maxHeight < col[i].clientHeight) maxHeight = col[i].clientHeight;
+                    if (maxHeight < column[j].clientHeight) maxHeight = column[j].clientHeight;
                 }
             });
             
@@ -73,6 +92,34 @@ class ImageRender extends React.Component {
             this.col0Height = col0Heights.reduce((a, b) => a + b);
             this.col1Height = col1Heights.reduce((a, b) => a + b);
             this.col2Height = col2Heights.reduce((a, b) => a + b);
+
+            // Find the smallest column to add an image to.
+            const findSmallestColumn = (col, colHeights, colHeight) => {
+                
+                switch(Math.min(this.col0Height, this.col1Height, this.col2Height)) {
+
+                    case this.col0Height:
+                        moveImage(col0, 'col0Height', col0Heights, col, colHeights, colHeight);
+                        break;
+
+                    case this.col1Height:
+                        moveImage(col1, 'col1Height', col1Heights, col, colHeights, colHeight);
+                        break;
+
+                    default:
+                        moveImage(col2, 'col2Height', col2Heights, col, colHeights, colHeight);
+                        break;
+                }
+            };
+
+            // Move image from larger to smaller column, update column and image heights.
+            const moveImage = (smallCol, smallColHeight, smallColHeights, bigCol, bigColHeights, bigColHeight) => {
+
+                smallCol.push(bigCol.pop());
+                smallColHeights.push(bigColHeights.pop());
+                this[smallColHeight] = smallColHeights.reduce((a, b) => a + b);
+                this[bigColHeight] = bigColHeights.reduce((a, b) => a + b);
+            };
 
             // While diff between columns > max image height, keep moving images.
             while ( Math.abs(this.col0Height - this.col1Height) > maxHeight ||
@@ -96,43 +143,10 @@ class ImageRender extends React.Component {
                 }
             }
 
-            function findSmallestColumn(col, colHeights, colHeight) {
-                
-                // Find the smallest column to add an image to.
-                switch(Math.min(_this.col0Height, _this.col1Height, _this.col2Height)) {
-
-                    case _this.col0Height:
-                        moveImage(col0, 'col0Height', col0Heights, col, colHeights, colHeight);
-                        break;
-
-                    case _this.col1Height:
-                        moveImage(col1, 'col1Height', col1Heights, col, colHeights, colHeight);
-                        break;
-
-                    default:
-                        moveImage(col2, 'col2Height', col2Heights, col, colHeights, colHeight);
-                        break;
-                }
-            }
-
-            // Move image from larger to smaller column, update column and image heights.
-            function moveImage(colA, colAHeight, colAHeights, colB, colBHeights, colBHeight) {
-
-                colA.push(colB.pop());
-                colAHeights.push(colBHeights.pop());
-                _this[colAHeight] = colAHeights.reduce((a, b) => a + b);
-                _this[colBHeight] = colBHeights.reduce((a, b) => a + b);
-            }
-
             // Set state with the finalised column arrays.
             this.setState({ columns: [ col0, col1, col2 ], loadedImages: loadedImages + 1, sorted: true });
 
-        } else {
-
-            if (loadedImages < this.props.images.length) {
-                this.setState({ loadedImages: loadedImages + 1 });
-            }
-        }
+        } else if (loadedImages < images.length) this.setState({ loadedImages: loadedImages + 1 });
     }
 
     // When an image enters/leaves the viewport, set the src to be thumbnail/full image
@@ -159,7 +173,6 @@ class ImageRender extends React.Component {
                                     onLoad={this.onImgLoad}
                                     alt={`From ${imageLink}`}
                                     key={imageLink}
-                                    ref={c => this[imageLink] = c}
                                     className={`image ${imageLink}`}
                                     src={require(`../assets/thumbnails/${imageLink}`)}
                                     onClick ={() => this.setState({ selectedImage: imageLink })}
