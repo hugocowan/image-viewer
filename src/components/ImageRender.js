@@ -1,6 +1,5 @@
 import React from 'react';
 import Modal from './Modal';
-// import { Img } from 'react-progressive-loader';
 
 class ImageRender extends React.Component {
 
@@ -8,14 +7,6 @@ class ImageRender extends React.Component {
         super(props);
 
         const columns = [ [], [], [] ];
-
-        const options = {
-            // root: window,
-            // rootMargin: '0px',
-            // threshold: 0.1
-            trackVisibility: true,
-            delay: 100,
-        };
         
         props.images.forEach((image, index) => {
 
@@ -23,16 +14,13 @@ class ImageRender extends React.Component {
             index % 3 === 0 ? columns[2].push(image) :
             index % 2 === 0 ? columns[1].push(image) :
                 columns[0].push(image);
-
         });
 
         this.state = {
-
             columns,
             sorted: false,
             loadedImages: 0,
             selectedImage: '',
-            ratios: {},
         };
 
         // Declare colHeight vars here so they can be referenced anywhere.
@@ -40,25 +28,7 @@ class ImageRender extends React.Component {
         this.col1Height = 0;
         this.col2Height = 0;
 
-        this.observer = new IntersectionObserver(this.onIntersection, options);
-    }
-
-    componentDidUpdate() {
-
-        if (this.state.sorted && this.props.images.length > this.state.loadedImages) {
-            
-            const columns = [ ...this.state.columns ];
-            
-            this.props.images.slice(this.state.loadedImages).forEach((image, index) => {
-
-                index % 3 === 0 ? columns[2].push(image) :
-                index % 2 === 0 ? columns[1].push(image) :
-                columns[0].push(image);
-            });
-            
-
-            this.setState({ columns, sorted: false, loadedImages: 0 });
-        }
+        this.observer = new IntersectionObserver(this.handleIntersection);
     }
     
     // Ensure image column heights <= biggest image height:
@@ -72,12 +42,9 @@ class ImageRender extends React.Component {
     // Once the columns are leveled out, set state with the new column arrays.
     onImgLoad = ({ target }) => {
 
-        let { loadedImages, ratios } = this.state, src = target.alt.split('From ')[1];
+        let { loadedImages } = this.state;
 
         this.observer.observe(target);
-            
-        if (!ratios[src]) ratios[src] = target.naturalHeight / target.naturalWidth
-
         
         if (!this.state.sorted && loadedImages + 1 === this.props.images.length) {
 
@@ -96,7 +63,7 @@ class ImageRender extends React.Component {
                     
                     index === 0 ? col0Heights.push(col[i].clientHeight) :
                     index === 1 ? col1Heights.push(col[i].clientHeight) :
-                                    col2Heights.push(col[i].clientHeight);
+                        col2Heights.push(col[i].clientHeight);
 
                     if (maxHeight < col[i].clientHeight) maxHeight = col[i].clientHeight;
                 }
@@ -158,26 +125,21 @@ class ImageRender extends React.Component {
             }
 
             // Set state with the finalised column arrays.
-            this.props.setIsLoading(false);
-            this.setState({ columns: [ col0, col1, col2 ], loadedImages: loadedImages + 1, sorted: true, ratios });
+            this.setState({ columns: [ col0, col1, col2 ], loadedImages: loadedImages + 1, sorted: true });
 
         } else {
 
             if (loadedImages < this.props.images.length) {
-                this.props.setIsLoading(true);
-                this.setState({ loadedImages: loadedImages + 1, ratios });
+                this.setState({ loadedImages: loadedImages + 1 });
             }
         }
     }
 
-    onIntersection = (entries, observer) => {
-
-        entries.forEach(entry => {
-
-            if (entry.isVisible) entry.target.src = require(`../assets/${entry.target.classList[1]}`);
-            else entry.target.src = require(`../assets/thumbnails/${entry.target.classList[1]}`);
-        });
-    }
+    // When an image enters/leaves the viewport, set the src to be thumbnail/full image
+    handleIntersection = entries => 
+        entries.forEach(entry =>
+            entry.intersectionRatio > 0 ? entry.target.src = require(`../assets/${entry.target.classList[1]}`)
+            : entry.target.src = require(`../assets/thumbnails/${entry.target.classList[1]}`));
 
     render() {
 
@@ -187,7 +149,6 @@ class ImageRender extends React.Component {
                 <Modal 
                     imageLink={this.state.selectedImage}
                     onClick ={() => this.setState({ selectedImage: '' })}
-                
                 />}
                 <div className='img-container'>
                     {this.state.columns.map((col, i) => {

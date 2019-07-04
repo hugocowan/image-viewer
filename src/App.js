@@ -11,37 +11,9 @@ class App extends React.Component {
             images: require.context('./assets', false, /\.(png|jpe?g|gif)$/)
                         .keys()
                         .map(imageLink => imageLink.replace('./', '')),
-            imageLimit: 1000,
-            imagesMax: null,
-            isLoading: true,
         };
 
-        this.state.imagesMax = this.state.images.length;
         this.state.images = this.shuffle(this.state.images);
-    }
-
-    componentDidMount() {
-        
-        window.onscroll = this.debounce(() => {
-            
-            const { isLoading, imageLimit, imagesMax } = this.state;
-            
-            if (isLoading || imageLimit >= imagesMax) return;
-            
-            if (window.innerHeight + window.pageYOffset === 
-                document.documentElement.offsetHeight)
-            {
-                this.setState({ isLoading: true, imageLimit: imageLimit + 1000 });
-            }
-            
-        }, 500);
-    }
-
-    componentDidUpdate() {
-
-        if (this.state.imageLimit >= this.state.imagesMax) {
-            window.onscroll = null;
-        }
     }
 
     shuffle = (array) => {
@@ -100,22 +72,11 @@ class App extends React.Component {
         }
     }
 
-    setIsLoading = (bool) => {
-        this.setState({ isLoading: bool });
-    }
-
     render() {
         
         return (
             <div className="App">
-                <ImageRender 
-                    images = {this.state.images.slice(0, this.state.imageLimit)}
-                    setIsLoading = {this.setIsLoading}
-                    isLoading = {this.state.isLoading}
-                />
-                {/* {this.state.isLoading && <div>
-                    Loading...
-                </div>} */}
+                <ImageRender images = {this.state.images}/>
             </div>
         );
     }
