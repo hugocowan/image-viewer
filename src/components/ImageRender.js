@@ -214,7 +214,7 @@ class ImageRender extends React.Component {
                                     key={imageLink}
                                     ref={c => this[imageLink] = c}
                                     className={`image ${imageLink}`}
-                                    src={require(`../assets/thumbnails/${imageLink}`)}
+                                    src={require(`../assets/${imageLink}`)}
                                     onClick ={() => this.setState({ selectedImage: imageLink })}
                                 />
                             )}
