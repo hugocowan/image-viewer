@@ -31,4 +31,6 @@ The images are shown in random order, different every time. I'll be adding more 
 
 * Type `serve -s build` and hit enter.
 
+* Go to the url specified to view your locally hosted webpage.
+
 You can detach from the tmux session with `Ctrl-b d`, and re-attach to it with `tmux attach -t [session name]`. Find the session name by typing `tmux list-sessions` (normally `0`).
