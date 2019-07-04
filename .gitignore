@@ -23,5 +23,6 @@ yarn-debug.log*
 yarn-error.log*
 /src/assets/*
 !/src/assets/thumbnails/
+/src/assets/thumbnails/*
 !/src/assets/thumbnails/.gitkeep
 !/src/assets/.gitkeep
