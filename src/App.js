@@ -11,15 +11,13 @@ class App extends React.Component {
             images: require.context('./assets', false, /\.(png|jpe?g|gif)$/)
                         .keys()
                         .map(imageLink => imageLink.replace('./', '')),
-            imageLimit: 33,
+            imageLimit: 1000,
             imagesMax: null,
             isLoading: true,
         };
 
         this.state.imagesMax = this.state.images.length;
         this.state.images = this.shuffle(this.state.images);
-
-        console.log(window.innerHeight);
     }
 
     componentDidMount() {
@@ -33,7 +31,7 @@ class App extends React.Component {
             if (window.innerHeight + window.pageYOffset === 
                 document.documentElement.offsetHeight)
             {
-                this.setState({ isLoading: true, imageLimit: imageLimit + 33 });
+                this.setState({ isLoading: true, imageLimit: imageLimit + 1000 });
             }
             
         }, 500);

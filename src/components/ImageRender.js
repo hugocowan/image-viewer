@@ -1,6 +1,6 @@
 import React from 'react';
 import Modal from './Modal';
-import { Img } from 'react-progressive-loader';
+// import { Img } from 'react-progressive-loader';
 
 class ImageRender extends React.Component {
 
@@ -8,6 +8,14 @@ class ImageRender extends React.Component {
         super(props);
 
         const columns = [ [], [], [] ];
+
+        const options = {
+            // root: window,
+            // rootMargin: '0px',
+            // threshold: 0.1
+            trackVisibility: true,
+            delay: 100,
+        };
         
         props.images.forEach((image, index) => {
 
@@ -24,20 +32,16 @@ class ImageRender extends React.Component {
             sorted: false,
             loadedImages: 0,
             selectedImage: '',
-            ratios: {}
+            ratios: {},
+            visChecked: false,
         };
 
         // Declare colHeight vars here so they can be referenced anywhere.
         this.col0Height = 0;
         this.col1Height = 0;
         this.col2Height = 0;
-    }
 
-    componentDidMount() {
-
-        if (this.state.sorted) {
-
-        }
+        this.observer = new IntersectionObserver(this.onIntersection, options);
     }
 
     componentDidUpdate() {
@@ -69,9 +73,11 @@ class ImageRender extends React.Component {
     // Once the columns are leveled out, set state with the new column arrays.
     onImgLoad = ({ target }) => {
 
-        let { loadedImages, ratios } = this.state, key = target.alt.split('From ')[1];
+        let { loadedImages, ratios } = this.state, src = target.alt.split('From ')[1];
+
+        this.observer.observe(target);
             
-        if (!ratios[key]) ratios[key] = target.naturalHeight / target.naturalWidth
+        if (!ratios[src]) ratios[src] = target.naturalHeight / target.naturalWidth
 
         
         if (!this.state.sorted && loadedImages + 1 === this.props.images.length) {
@@ -165,6 +171,28 @@ class ImageRender extends React.Component {
         }
     }
 
+    onIntersection = (entries, observer) => {
+
+        console.log(entries, observer);
+
+        if (this.state.sorted) {
+
+            entries.forEach(entry => {
+
+                if (!this.state.visChecked) {
+                    entry.target.src = require(`../assets/${entry.target.classList[1]}`);
+                    return;
+                }
+    
+                if (entry.isVisible) entry.target.src = require(`../assets/${entry.target.classList[1]}`);
+                else entry.target.src = require(`../assets/thumbnails/${entry.target.classList[1]}`);
+    
+            });
+
+            if (!this.state.visCheck) this.setState({ visChecked: true });
+        }
+    }
+
     render() {
 
         return (
@@ -180,26 +208,15 @@ class ImageRender extends React.Component {
 
                         return <div key={col} className='img-wrapper' ref={c => this[`col${i}`] = c}>
                             {col.map(imageLink =>
-                            <div key={imageLink} className={'image'}>
-                                    <div ref={c => this[imageLink] = c}>
-                                        {this.state.sorted && <Img
-                                            loadOnScreen
-                                            bgColor={'#282c34'}
-                                            aspectRatio={this.state.ratios[imageLink]}
-                                            alt={`From ${imageLink}`}
-                                            className={`image ${imageLink}`}
-                                            src={require(`../assets/${imageLink}`)}
-                                            onClick={() => this.setState({ selectedImage: imageLink })}
-                                            placeholderSrc={require(`../assets/thumbnails/${imageLink}`)}
-                                        />}
-                                        {!this.state.sorted && <img
-                                            onLoad={this.onImgLoad}
-                                            alt={`From ${imageLink}`}
-                                            className={`image ${imageLink}`}
-                                            src={require(`../assets/thumbnails/${imageLink}`)}
-                                        />}
-                                    </div>
-                            </div>
+                                <img
+                                    onLoad={this.onImgLoad}
+                                    alt={`From ${imageLink}`}
+                                    key={imageLink}
+                                    ref={c => this[imageLink] = c}
+                                    className={`image ${imageLink}`}
+                                    src={require(`../assets/thumbnails/${imageLink}`)}
+                                    onClick ={() => this.setState({ selectedImage: imageLink })}
+                                />
                             )}
                     </div>})}
                 </div>
