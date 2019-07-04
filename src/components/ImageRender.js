@@ -1,6 +1,6 @@
 import React from 'react';
 import Modal from './Modal';
-import { Waypoint } from 'react-waypoint';
+import { Img } from 'react-progressive-loader';
 
 class ImageRender extends React.Component {
 
@@ -24,6 +24,7 @@ class ImageRender extends React.Component {
             sorted: false,
             loadedImages: 0,
             selectedImage: '',
+            ratios: {}
         };
 
         // Declare colHeight vars here so they can be referenced anywhere.
@@ -66,9 +67,11 @@ class ImageRender extends React.Component {
     // Update the new column sizes.
     // Check again until the column height difference <= max image height.
     // Once the columns are leveled out, set state with the new column arrays.
-    onImgLoad = () => {
+    onImgLoad = ({ target }) => {
 
-        let loadedImages = this.state.loadedImages;
+        let { loadedImages, ratios } = this.state, key = target.alt.split('From ')[1];
+            
+        if (!ratios[key]) ratios[key] = target.naturalHeight / target.naturalWidth
 
         
         if (!this.state.sorted && loadedImages + 1 === this.props.images.length) {
@@ -151,43 +154,16 @@ class ImageRender extends React.Component {
 
             // Set state with the finalised column arrays.
             this.props.setIsLoading(false);
-            this.setState({ columns: [ col0, col1, col2 ], loadedImages: loadedImages + 1, sorted: true });
+            this.setState({ columns: [ col0, col1, col2 ], loadedImages: loadedImages + 1, sorted: true, ratios });
 
         } else {
 
             if (loadedImages < this.props.images.length) {
                 this.props.setIsLoading(true);
-                this.setState({ loadedImages: loadedImages + 1 });
+                this.setState({ loadedImages: loadedImages + 1, ratios });
             }
-        
         }
     }
-
-    handleEnter = (e, img, src) => {
-
-        if (this.state.sorted) {
-
-            console.log('Enter:', e, img);
-            img.src = require(`../assets/${src}`);
-        }
-    }
-
-    handleLeave = (e, img, src) => {
-
-        if (this.state.sorted) {
-            
-            console.log('Leave:', e, img);
-            img.src = `https://via.placeholder.com/${img.clientWidth}x${img.clientHeight || 100}.png/282c34/282c34`;
-        }
-    }
-
-    Img = React.forwardRef((props, ref) => {
-        return <img
-            
-            
-            { ...props }
-        />
-    });
 
     render() {
 
@@ -203,22 +179,27 @@ class ImageRender extends React.Component {
                     {this.state.columns.map((col, i) => {
 
                         return <div key={col} className='img-wrapper' ref={c => this[`col${i}`] = c}>
-                            {col.map((imageLink, index, arr) =>
-                                <Waypoint 
-                                    key={imageLink} 
-                                    onEnter={(e) => this.handleEnter(e, this[imageLink], imageLink)} 
-                                    onLeave={(e) => this.handleLeave(e, this[imageLink], imageLink)}
-                                    scrollableAncestor={window}
-                                    // debug={true}
-                                >
-                                    <img
-                                        ref={c => this[imageLink] = c}
-                                        alt={`From ${imageLink}`}
-                                        src={require(`../assets/${imageLink}`)}
-                                        onLoad={this.onImgLoad}
-                                        onClick={() => this.setState({ selectedImage: imageLink })}
-                                    />
-                                </Waypoint>
+                            {col.map(imageLink =>
+                            <div key={imageLink} className={'image'}>
+                                    <div ref={c => this[imageLink] = c}>
+                                        {this.state.sorted && <Img
+                                            loadOnScreen
+                                            bgColor={'#282c34'}
+                                            aspectRatio={this.state.ratios[imageLink]}
+                                            alt={`From ${imageLink}`}
+                                            className={`image ${imageLink}`}
+                                            src={require(`../assets/${imageLink}`)}
+                                            onClick={() => this.setState({ selectedImage: imageLink })}
+                                            placeholderSrc={require(`../assets/thumbnails/${imageLink}`)}
+                                        />}
+                                        {!this.state.sorted && <img
+                                            onLoad={this.onImgLoad}
+                                            alt={`From ${imageLink}`}
+                                            className={`image ${imageLink}`}
+                                            src={require(`../assets/thumbnails/${imageLink}`)}
+                                        />}
+                                    </div>
+                            </div>
                             )}
                     </div>})}
                 </div>

@@ -1258,6 +1258,11 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-12.0.0.tgz#d11813b9c0ff8aaca29f04cbc12817f4c7d656e5"
   integrity sha512-Jrb/x3HT4PTJp6a4avhmJCDEVrPdqLfl3e8GGMbpkGGdwAV5UGlIs4vVEfsHHfylZVOKZWpOqmqFH8CbfOZ6kg==
 
+"@types/prop-types@^15.5.3":
+  version "15.7.1"
+  resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.7.1.tgz#f1a11e7babb0c3cad68100be381d1e064c68f1f6"
+  integrity sha512-CFzn9idOEpHrgdw8JsoTkaDDyRWk1jrzIV8djzcgpq0y9tG4B4lFT+Nxh52DVpDXV+n4+NPNv7M1Dj5uMp6XFg==
+
 "@types/q@^1.5.1":
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/@types/q/-/q-1.5.2.tgz#690a1475b84f2a884fd07cd797c00f5f31356ea8"
@@ -8083,6 +8088,14 @@ react-app-polyfill@^1.0.1:
     regenerator-runtime "0.13.2"
     whatwg-fetch "3.0.0"
 
+react-deco@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/react-deco/-/react-deco-0.7.0.tgz#429904968240bc85f3c6b232c27aefda00e9512d"
+  integrity sha512-49YZJY/k9gSa3R6KrBxXEaGjk1xJky5kH9o5FMEE2zes8xrUqQx7aBwAxqvXSK9Pgck7r6zioRqbYY2JzHchdQ==
+  dependencies:
+    "@types/prop-types" "^15.5.3"
+    prop-types "^15.6.2"
+
 react-dev-utils@^9.0.1:
   version "9.0.1"
   resolved "https://registry.yarnpkg.com/react-dev-utils/-/react-dev-utils-9.0.1.tgz#5c03d85a0b2537d0c46af7165c24a7dfb274bef2"
@@ -8133,6 +8146,15 @@ react-is@^16.6.3, react-is@^16.8.1, react-is@^16.8.4:
   version "16.8.6"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.8.6.tgz#5bbc1e2d29141c9fbdfed456343fe2bc430a6a16"
   integrity sha512-aUk3bHfZ2bRSVFFbbeVS4i+lNPZr3/WM5jT2J5omUVV1zzcs1nAaf3l51ctA5FFvCRbhrH0bdAsRRQddFJZPtA==
+
+react-progressive-loader@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/react-progressive-loader/-/react-progressive-loader-0.3.1.tgz#65eea0e4e3cd7b81ef99494aa6838e3e5269ac2b"
+  integrity sha512-7ggt69vyPamdE12zDtYFyAqj9J2bS0ckxqNhduJbGJRgEs5dWkq8c2FXqVPIgPZg9TJFmvbBDfGn9XByl39WKw==
+  dependencies:
+    "@types/prop-types" "^15.5.3"
+    prop-types "^15.6.2"
+    react-deco "^0.7.0"
 
 react-scripts@3.0.1:
   version "3.0.1"

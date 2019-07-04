@@ -36,7 +36,7 @@ class App extends React.Component {
                 this.setState({ isLoading: true, imageLimit: imageLimit + 33 });
             }
             
-        }, 250);
+        }, 500);
     }
 
     componentDidUpdate() {
