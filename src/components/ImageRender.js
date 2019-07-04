@@ -33,7 +33,6 @@ class ImageRender extends React.Component {
             loadedImages: 0,
             selectedImage: '',
             ratios: {},
-            visChecked: false,
         };
 
         // Declare colHeight vars here so they can be referenced anywhere.
@@ -173,24 +172,11 @@ class ImageRender extends React.Component {
 
     onIntersection = (entries, observer) => {
 
-        console.log(entries, observer);
+        entries.forEach(entry => {
 
-        if (this.state.sorted) {
-
-            entries.forEach(entry => {
-
-                if (!this.state.visChecked) {
-                    entry.target.src = require(`../assets/${entry.target.classList[1]}`);
-                    return;
-                }
-    
-                if (entry.isVisible) entry.target.src = require(`../assets/${entry.target.classList[1]}`);
-                else entry.target.src = require(`../assets/thumbnails/${entry.target.classList[1]}`);
-    
-            });
-
-            if (!this.state.visCheck) this.setState({ visChecked: true });
-        }
+            if (entry.isVisible) entry.target.src = require(`../assets/${entry.target.classList[1]}`);
+            else entry.target.src = require(`../assets/thumbnails/${entry.target.classList[1]}`);
+        });
     }
 
     render() {
@@ -214,7 +200,7 @@ class ImageRender extends React.Component {
                                     key={imageLink}
                                     ref={c => this[imageLink] = c}
                                     className={`image ${imageLink}`}
-                                    src={require(`../assets/${imageLink}`)}
+                                    src={require(`../assets/thumbnails/${imageLink}`)}
                                     onClick ={() => this.setState({ selectedImage: imageLink })}
                                 />
                             )}
