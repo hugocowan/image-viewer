@@ -1,7 +1,8 @@
 import React from 'react';
-import ImageRender from './components/ImageRender';
-import Navbar from './components/Navbar';
 import './App.scss';
+import Modal from './components/Modal';
+import Navbar from './components/Navbar';
+import ImageRender from './components/ImageRender';
 
 class App extends React.Component {
 
@@ -14,6 +15,7 @@ class App extends React.Component {
                         .map(imageLink => imageLink.replace('./', '')),
             sortType: 'shuffle',
             updateNeeded: false,
+            selectedImage: '',
         };
 
         this.state.images = this.shuffle(this.state.images);
@@ -107,9 +109,14 @@ class App extends React.Component {
                     handleSortChange={this.handleSortChange} 
                     sortType={this.state.sortType} 
                 />
+                {this.state.selectedImage && <Modal 
+                    imageLink={this.state.selectedImage}
+                    onClick ={() => this.setState({ selectedImage: '' })}
+                />}
                 <ImageRender 
                     images={this.state.images} 
                     handleSort={this.handleSort} 
+                    handleSelectedImageChange={src => this.setState({ selectedImage: src })}
                     updateNeeded={this.state.updateNeeded}
                     updateDone={() => this.setState({ updateNeeded: false })}
                 />

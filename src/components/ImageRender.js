@@ -1,5 +1,4 @@
 import React from 'react';
-import Modal from './Modal';
 
 class ImageRender extends React.Component {
 
@@ -20,7 +19,6 @@ class ImageRender extends React.Component {
             columns,
             sorted: false,
             loadedImages: 0,
-            selectedImage: '',
             sortType: props.sortType,
         };
 
@@ -49,7 +47,7 @@ class ImageRender extends React.Component {
         
         this.props.updateDone();
 
-        this.setState({ columns, sortType: this.props.sortType });
+        this.setState({ columns, sortType: this.props.sortType, sorted: false, loadedImages: 0 });
     }
     
     // Ensure image column heights <= biggest image height:
@@ -73,8 +71,7 @@ class ImageRender extends React.Component {
             const columnChildren = [ this.col0.children, this.col1.children, this.col2.children ];
 
             let [ col0, col1, col2 ] = [ ...columns ],
-            col0Heights = [], col1Heights = [], col2Heights = [],
-            maxHeight = 0;
+            col0Heights = [], col1Heights = [], col2Heights = [];
             
             // Get individual image sizes from each column's HTMLCollection of images, in order. Also get max image height.
             columnChildren.forEach((column, i) => {
@@ -84,9 +81,15 @@ class ImageRender extends React.Component {
                     i === 1 ? col1Heights.push(column[j].clientHeight) :
                         col2Heights.push(column[j].clientHeight);
 
-                    if (maxHeight < column[j].clientHeight) maxHeight = column[j].clientHeight;
+                    // if (maxHeight < column[j].clientHeight) maxHeight = column[j].clientHeight;
                 }
             });
+
+            let maxHeight = Math.max(
+                col0Heights[col0Heights.length - 1], 
+                col1Heights[col1Heights.length - 1],
+                col2Heights[col2Heights.length - 1],
+            );
             
             // Get the current height of each column by adding up the image heights.
             this.col0Height = col0Heights.reduce((a, b) => a + b);
@@ -119,6 +122,11 @@ class ImageRender extends React.Component {
                 smallColHeights.push(bigColHeights.pop());
                 this[smallColHeight] = smallColHeights.reduce((a, b) => a + b);
                 this[bigColHeight] = bigColHeights.reduce((a, b) => a + b);
+                maxHeight = Math.max(
+                    col0Heights[col0Heights.length - 1], 
+                    col1Heights[col1Heights.length - 1],
+                    col2Heights[col2Heights.length - 1],
+                );
             };
 
             // While diff between columns > max image height, keep moving images.
@@ -159,14 +167,8 @@ class ImageRender extends React.Component {
 
         return (
             <div>
-                {this.state.selectedImage && 
-                <Modal 
-                    imageLink={this.state.selectedImage}
-                    onClick ={() => this.setState({ selectedImage: '' })}
-                />}
                 <div className='img-container'>
                     {this.state.columns.map((col, i) => {
-
                         return <div key={col} className='img-wrapper' ref={c => this[`col${i}`] = c}>
                             {col.map(imageLink =>
                                 <img
@@ -175,7 +177,7 @@ class ImageRender extends React.Component {
                                     key={imageLink}
                                     className={`image ${imageLink}`}
                                     src={require(`../assets/thumbnails/${imageLink}`)}
-                                    onClick ={() => this.setState({ selectedImage: imageLink })}
+                                    onClick ={() => this.props.handleSelectedImageChange(imageLink)}
                                 />
                             )}
                     </div>})}
