@@ -11,14 +11,22 @@ class App extends React.Component {
 
         this.state = {
             images: require.context('./assets', false, /\.(png|jpe?g|gif)$/)
-                        .keys()
-                        .map(imageLink => imageLink.replace('./', '')),
+                .keys()
+                .map(imageLink => imageLink.replace('./', '')),
             sortType: 'shuffle',
             updateNeeded: false,
             selectedImage: '',
+            enableDelete: false,
         };
 
         this.state.images = this.shuffle(this.state.images);
+    }
+
+    componentDidMount() {
+        fetch('/api/images')
+            .then(res => res.json())
+            .then(res => console.log(res))
+            .catch(err => console.log('error:', err));
     }
 
     shuffle = (array) => {
@@ -107,11 +115,14 @@ class App extends React.Component {
             <div className="App">
                 <Navbar 
                     handleSortChange={this.handleSortChange} 
-                    sortType={this.state.sortType} 
+                    sortType={this.state.sortType}
+                    toggleDelete={() => this.setState({ enableDelete: !this.state.enableDelete})}
+                    enableDelete={this.state.enableDelete}
                 />
                 {this.state.selectedImage && <Modal 
                     imageLink={this.state.selectedImage}
                     onClick ={() => this.setState({ selectedImage: '' })}
+                    enableDelete={this.state.enableDelete}
                 />}
                 <ImageRender 
                     images={this.state.images} 

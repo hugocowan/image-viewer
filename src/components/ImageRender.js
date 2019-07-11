@@ -90,6 +90,8 @@ class ImageRender extends React.Component {
                 col1Heights[col1Heights.length - 1],
                 col2Heights[col2Heights.length - 1],
             );
+
+            if (Math.min(col0Heights.length, col1Heights.length, col2Heights.length) === 0) return;
             
             // Get the current height of each column by adding up the image heights.
             this.col0Height = col0Heights.reduce((a, b) => a + b);
