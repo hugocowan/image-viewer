@@ -23,7 +23,7 @@ class App extends React.Component {
     }
 
     componentDidMount() {
-        fetch('/api/images')
+        fetch('http://localhost:5001/api/images')
             .then(res => res.json())
             .then(res => console.log(res))
             .catch(err => console.log('error:', err));
@@ -46,7 +46,7 @@ class App extends React.Component {
         }
       
         return array;
-    }
+    };
 
     naturalSort = (a, b) => {
                 
@@ -63,7 +63,7 @@ class App extends React.Component {
         }
     
         return ax.length - bx.length;
-    }
+    };
 
     handleSortChange = (sortType) => {
     
@@ -87,27 +87,7 @@ class App extends React.Component {
 
         this.setState({ sortType, images, updateNeeded: true });
 
-    }
-
-    debounce = (func, wait) => {
-        
-        let timeout;
-
-        return function () {
-
-            const _this = this, args = arguments, callNow = !timeout,
-                later = function () {
-
-                    timeout = null;
-                    func.apply(_this, args);
-                };
-            
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-
-            if (callNow) func.apply(_this, args);
-        }
-    }
+    };
 
     render() {
         

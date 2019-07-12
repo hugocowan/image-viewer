@@ -26,3 +26,5 @@ yarn-error.log*
 /src/assets/thumbnails/*
 !/src/assets/thumbnails/.gitkeep
 !/src/assets/.gitkeep
+
+/idea

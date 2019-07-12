@@ -5,11 +5,11 @@ const fs = require('fs');
 
 function indexRoute(req, res, next) {
 
-    res.json({ message: 'Oh hey there!' });
+    res.json({ message: 'API calls are working!' });
 }
 
 
-const storageMain = multer.diskStorage({
+const storage = multer.diskStorage({
     destination: function(req, file, cb) {
         cb(null, './src/assets/');
     },
@@ -18,29 +18,24 @@ const storageMain = multer.diskStorage({
     }
 });
 
-const uploadMain = multer({
-    storage: storageMain,
-    limits: {
-        fileSize: 1000000
-    },
-}).single('imageData');
+const uploadMain = multer({ storage }).single('imageData');
 
 
 function uploadRoute(req, res, next) {
         
-        uploadMain(req, res, err => {
-            
-            sharp(req.file.path)
-                .resize({ width: 100 })
-                .toFile('./src/assets/thumbnails/' + path.basename(req.file.originalname));
+    uploadMain(req, res, err => {
 
-            if (err) { 
-                res.json({ message: err });
-                return;
-            }
-    
-            res.json({ message: 'Success!' });
-        });
+        sharp(req.file.path)
+            .resize({ width: 100 })
+            .toFile('./src/assets/thumbnails/' + path.basename(req.file.originalname));
+
+        if (err) {
+            res.json({ message: err });
+            return;
+        }
+
+        res.json({ message: 'Success!' });
+    });
 }
 
 function deleteRoute(req, res, next) {

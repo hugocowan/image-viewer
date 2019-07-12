@@ -157,7 +157,7 @@ class ImageRender extends React.Component {
             this.setState({ columns: [ col0, col1, col2 ], loadedImages: loadedImages + 1, sorted: true });
 
         } else if (loadedImages < images.length) this.setState({ loadedImages: loadedImages + 1 });
-    }
+    };
 
     // When an image enters/leaves the viewport, set the src to be thumbnail/full image
     handleIntersection = entries => 
@@ -171,7 +171,7 @@ class ImageRender extends React.Component {
             <div>
                 <div className='img-container'>
                     {this.state.columns.map((col, i) => {
-                        return <div key={col} className='img-wrapper' ref={c => this[`col${i}`] = c}>
+                        return <div key={i} className='img-wrapper' ref={c => this[`col${i}`] = c}>
                             {col.map(imageLink =>
                                 <img
                                     onLoad={this.onImgLoad}
