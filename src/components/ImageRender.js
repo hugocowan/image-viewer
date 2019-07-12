@@ -90,6 +90,8 @@ class ImageRender extends React.Component {
                 col1Heights[col1Heights.length - 1],
                 col2Heights[col2Heights.length - 1],
             );
+
+            if (Math.min(col0Heights.length, col1Heights.length, col2Heights.length) === 0) return;
             
             // Get the current height of each column by adding up the image heights.
             this.col0Height = col0Heights.reduce((a, b) => a + b);
@@ -155,7 +157,7 @@ class ImageRender extends React.Component {
             this.setState({ columns: [ col0, col1, col2 ], loadedImages: loadedImages + 1, sorted: true });
 
         } else if (loadedImages < images.length) this.setState({ loadedImages: loadedImages + 1 });
-    }
+    };
 
     // When an image enters/leaves the viewport, set the src to be thumbnail/full image
     handleIntersection = entries => 
@@ -169,7 +171,7 @@ class ImageRender extends React.Component {
             <div>
                 <div className='img-container'>
                     {this.state.columns.map((col, i) => {
-                        return <div key={col} className='img-wrapper' ref={c => this[`col${i}`] = c}>
+                        return <div key={i} className='img-wrapper' ref={c => this[`col${i}`] = c}>
                             {col.map(imageLink =>
                                 <img
                                     onLoad={this.onImgLoad}

@@ -11,14 +11,22 @@ class App extends React.Component {
 
         this.state = {
             images: require.context('./assets', false, /\.(png|jpe?g|gif)$/)
-                        .keys()
-                        .map(imageLink => imageLink.replace('./', '')),
+                .keys()
+                .map(imageLink => imageLink.replace('./', '')),
             sortType: 'shuffle',
             updateNeeded: false,
             selectedImage: '',
+            enableDelete: false,
         };
 
         this.state.images = this.shuffle(this.state.images);
+    }
+
+    componentDidMount() {
+        fetch('http://localhost:5001/api/images')
+            .then(res => res.json())
+            .then(res => console.log(res))
+            .catch(err => console.log('error:', err));
     }
 
     shuffle = (array) => {
@@ -38,7 +46,7 @@ class App extends React.Component {
         }
       
         return array;
-    }
+    };
 
     naturalSort = (a, b) => {
                 
@@ -55,7 +63,7 @@ class App extends React.Component {
         }
     
         return ax.length - bx.length;
-    }
+    };
 
     handleSortChange = (sortType) => {
     
@@ -79,27 +87,7 @@ class App extends React.Component {
 
         this.setState({ sortType, images, updateNeeded: true });
 
-    }
-
-    debounce = (func, wait) => {
-        
-        let timeout;
-
-        return function () {
-
-            const _this = this, args = arguments, callNow = !timeout,
-                later = function () {
-
-                    timeout = null;
-                    func.apply(_this, args);
-                };
-            
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-
-            if (callNow) func.apply(_this, args);
-        }
-    }
+    };
 
     render() {
         
@@ -107,11 +95,14 @@ class App extends React.Component {
             <div className="App">
                 <Navbar 
                     handleSortChange={this.handleSortChange} 
-                    sortType={this.state.sortType} 
+                    sortType={this.state.sortType}
+                    toggleDelete={() => this.setState({ enableDelete: !this.state.enableDelete})}
+                    enableDelete={this.state.enableDelete}
                 />
                 {this.state.selectedImage && <Modal 
                     imageLink={this.state.selectedImage}
                     onClick ={() => this.setState({ selectedImage: '' })}
+                    enableDelete={this.state.enableDelete}
                 />}
                 <ImageRender 
                     images={this.state.images} 
