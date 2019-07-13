@@ -30,7 +30,7 @@ class Navbar extends React.Component {
         imageForm.append('imageName', 'file');
         imageForm.append('imageData', files[0]);
 
-        fetch('http://localhost:5001/api/upload', {
+        fetch(`${this.props.apiURL}:5001/api/upload`, {
             method: 'POST',
             body: imageForm,
         })

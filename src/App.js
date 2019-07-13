@@ -15,11 +15,16 @@ class App extends React.Component {
             updateNeeded: false,
             selectedImage: '',
             enableDelete: false,
+            apiURL: process.env.REACT_APP_API_URL
         };
     }
 
     componentDidMount() {
-        fetch('http://localhost:5001/api/images')
+        fetch(`${this.state.apiURL}:5001/api/images`, {
+            headers: {
+                'Accept': 'application/json',
+            },
+        })
             .then(res => res.json())
             .then(data => this.setState({ images: this.shuffle(data.files) }))
             .catch(err => console.log('error:', err));
@@ -89,11 +94,16 @@ class App extends React.Component {
 
     render() {
 
-        if (this.state.images === null) return<div>Loading...</div>;
+        if (this.state.images === null) return ( 
+            <div className="App">
+                Loading...
+            </div>
+        );
         
         return (
             <div className="App">
                 <Navbar 
+                    apiURL={this.state.apiURL}
                     handleSortChange={this.handleSortChange} 
                     sortType={this.state.sortType}
                     toggleDelete={() => this.setState({ enableDelete: !this.state.enableDelete})}
@@ -101,7 +111,9 @@ class App extends React.Component {
                     images={this.state.images}
                     onImageChange={images => this.onImageChange(images)}
                 />
-                {this.state.selectedImage && <Modal 
+                {this.state.selectedImage && 
+                <Modal
+                    apiURL={this.state.apiURL}
                     images={this.state.images}
                     imageLink={this.state.selectedImage}
                     enableDelete={this.state.enableDelete}
@@ -109,6 +121,7 @@ class App extends React.Component {
                     onClick ={() => this.setState({ selectedImage: '' })}
                 />}
                 <ImageRender 
+                    apiURL={this.state.apiURL}
                     images={this.state.images} 
                     handleSort={this.handleSort} 
                     handleSelectedImageChange={src => this.setState({ selectedImage: src })}

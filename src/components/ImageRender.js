@@ -164,8 +164,8 @@ class ImageRender extends React.Component {
     // When an image enters/leaves the viewport, set the src to be thumbnail/full image
     handleIntersection = entries =>
         entries.forEach(entry =>
-            entry.intersectionRatio > 0 ? entry.target.src = `http://localhost:5001/media/${entry.target.classList[1]}`
-            : entry.target.src = `http://localhost:5001/media/thumbnails/${entry.target.classList[1]}`);
+            entry.intersectionRatio > 0 ? entry.target.src = `${this.props.apiURL}:5001/media/${entry.target.classList[1]}`
+            : entry.target.src = `${this.props.apiURL}:5001/media/thumbnails/${entry.target.classList[1]}`);
 
     render() {
 
@@ -180,7 +180,7 @@ class ImageRender extends React.Component {
                                     alt={`From ${imageLink}`}
                                     key={imageLink}
                                     className={`image ${imageLink}`}
-                                    src={`http://localhost:5001/media/thumbnails/${imageLink}`}
+                                    src={`${this.props.apiURL}:5001/media/thumbnails/${imageLink}`}
                                     onClick ={() => this.props.handleSelectedImageChange(imageLink)}
                                 />
                             )}

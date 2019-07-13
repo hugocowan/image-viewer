@@ -3,7 +3,7 @@ import React from 'react';
 class Modal extends React.Component {
 
     onDelete = () => {
-        fetch('/api/delete', {
+        fetch(`${this.props.apiURL}:5001/api/delete`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -27,7 +27,7 @@ class Modal extends React.Component {
                 </div>}
                 <img
                     alt={`From ${this.props.imageLink}`}
-                    src={`http://localhost:5001/media/${this.props.imageLink}`}
+                    src={`${this.props.apiURL}:5001/media/${this.props.imageLink}`}
                 />
             </div>
 
