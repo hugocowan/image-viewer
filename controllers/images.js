@@ -5,7 +5,12 @@ const fs = require('fs');
 
 function indexRoute(req, res, next) {
 
-    res.json({ message: 'API calls are working!' });
+    const files = fs.readdirSync('./src/assets').reduce((files, file) => {
+        if (/\.(png|jpe?g|gif)$/.test(file)) files.push(file);
+        return files;
+    }, []);
+
+    res.json({ message: 'API calls are working!', files });
 }
 
 

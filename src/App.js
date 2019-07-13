@@ -10,22 +10,18 @@ class App extends React.Component {
         super(props);
 
         this.state = {
-            images: require.context('./assets', false, /\.(png|jpe?g|gif)$/)
-                .keys()
-                .map(imageLink => imageLink.replace('./', '')),
+            images: null,
             sortType: 'shuffle',
             updateNeeded: false,
             selectedImage: '',
             enableDelete: false,
         };
-
-        this.state.images = this.shuffle(this.state.images);
     }
 
     componentDidMount() {
         fetch('http://localhost:5001/api/images')
             .then(res => res.json())
-            .then(res => console.log(res))
+            .then(data => this.setState({ images: this.shuffle(data.files) }))
             .catch(err => console.log('error:', err));
     }
 
@@ -89,7 +85,11 @@ class App extends React.Component {
 
     };
 
+    onImageChange= images => this.setState({ images, updateNeeded: true });
+
     render() {
+
+        if (this.state.images === null) return<div>Loading...</div>;
         
         return (
             <div className="App">
@@ -98,11 +98,15 @@ class App extends React.Component {
                     sortType={this.state.sortType}
                     toggleDelete={() => this.setState({ enableDelete: !this.state.enableDelete})}
                     enableDelete={this.state.enableDelete}
+                    images={this.state.images}
+                    onImageChange={images => this.onImageChange(images)}
                 />
                 {this.state.selectedImage && <Modal 
+                    images={this.state.images}
                     imageLink={this.state.selectedImage}
-                    onClick ={() => this.setState({ selectedImage: '' })}
                     enableDelete={this.state.enableDelete}
+                    onImageChange={images => this.onImageChange(images)}
+                    onClick ={() => this.setState({ selectedImage: '' })}
                 />}
                 <ImageRender 
                     images={this.state.images} 

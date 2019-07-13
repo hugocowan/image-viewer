@@ -35,7 +35,14 @@ class Navbar extends React.Component {
             body: imageForm,
         })
             .then(res => res.json())
-            .then(res => console.log('res:', res))
+            .then(res => {
+                setTimeout(() => {
+                    
+                    const images = this.props.images;
+                    images.push(files[0].name);
+                    this.props.onImageChange(images);
+                }, 1000);
+            })
             .catch(err => console.log('error:', err));
     };
 

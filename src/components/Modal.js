@@ -11,6 +11,10 @@ class Modal extends React.Component {
             },
             body: JSON.stringify({ filename: this.props.imageLink })
         });
+
+        const images = this.props.images;
+        images.splice(images.indexOf(this.props.imageLink), 1);
+        this.props.onImageChange(images);
     }
 
     render() {
@@ -23,7 +27,7 @@ class Modal extends React.Component {
                 </div>}
                 <img
                     alt={`From ${this.props.imageLink}`}
-                    src={require(`../assets/${this.props.imageLink}`)}
+                    src={`http://localhost:5001/media/${this.props.imageLink}`}
                 />
             </div>
 
