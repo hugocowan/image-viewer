@@ -11,10 +11,12 @@ class App extends React.Component {
 
         this.state = {
             images: null,
+            makeFixed: false,
             sortType: 'shuffle',
             updateNeeded: false,
             selectedImage: '',
             enableDelete: false,
+            imagesForDeletion: [],
             apiURL: process.env.REACT_APP_API_URL
         };
     }
@@ -90,7 +92,24 @@ class App extends React.Component {
 
     };
 
-    onImageChange= images => this.setState({ images, updateNeeded: true });
+    handleSelectedImage = src => {
+
+        if (!this.state.enableDelete) {
+
+            this.setState({ selectedImage: src });
+            return;  
+        }
+
+        const delImgs = [ ...this.state.imagesForDeletion ];
+        delImgs.includes(src) ? delImgs.splice(delImgs.indexOf(src), 1) : delImgs.push(src);
+        this.setState({ imagesForDeletion: delImgs });
+    }
+
+    onImageChange = images => this.setState({ images, updateNeeded: true });
+
+    toggleDelete = () => this.state.enableDelete ?
+        this.setState({ enableDelete: !this.state.enableDelete, imagesForDeletion: [] }) 
+        : this.setState({ enableDelete: !this.state.enableDelete });
 
     render() {
 
@@ -106,9 +125,12 @@ class App extends React.Component {
                     apiURL={this.state.apiURL}
                     handleSortChange={this.handleSortChange} 
                     sortType={this.state.sortType}
-                    toggleDelete={() => this.setState({ enableDelete: !this.state.enableDelete})}
+                    toggleDelete={this.toggleDelete}
                     enableDelete={this.state.enableDelete}
+                    imagesForDeletion={this.state.imagesForDeletion}
                     images={this.state.images}
+                    makeFixed={this.state.makeFixed}
+                    toggleMakeFixed={() => this.setState({ makeFixed: !this.state.makeFixed })}
                     onImageChange={images => this.onImageChange(images)}
                 />
                 {this.state.selectedImage && 
@@ -121,10 +143,12 @@ class App extends React.Component {
                     onClick ={() => this.setState({ selectedImage: '' })}
                 />}
                 <ImageRender 
+                    makeFixed={this.state.makeFixed}
                     apiURL={this.state.apiURL}
                     images={this.state.images} 
                     handleSort={this.handleSort} 
-                    handleSelectedImageChange={src => this.setState({ selectedImage: src })}
+                    handleSelectedImage={src => this.handleSelectedImage(src)}
+                    imagesForDeletion={this.state.imagesForDeletion}
                     updateNeeded={this.state.updateNeeded}
                     updateDone={() => this.setState({ updateNeeded: false })}
                 />

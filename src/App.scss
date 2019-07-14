@@ -9,6 +9,13 @@
         overflow: none;
         font-size: 14px;
 
+        &.true {
+            position: fixed;
+            background: #282c34;
+            width: 100%;
+            z-index: 1;
+        }
+
         .burger {
             cursor: pointer;
             position: absolute;
@@ -125,6 +132,12 @@
                     display: inline-block;
                     cursor: pointer;
                 }
+
+                &.delete {
+                    border: 2px #4D555F solid;
+                    padding: 3px;
+                    border-radius: 10px;
+                }
             }
         }
         
@@ -142,33 +155,69 @@
     }
  
     
-    
-    .img-container {
-        display: flex;
-        flex-flow: row wrap;
-        align-items: flex-start;
-        justify-content: center;
-        padding: 5px;
-        margin: 0 auto;
+    .main {
 
-        .img-wrapper {
+        &.true {
+            margin-top: 47px;
+        } 
+
+        .img-container {
             display: flex;
-            width: calc(33% - 10px);
-            flex-flow: column wrap;
-            align-items: center;
-            justify-content: space-between;
-            height: 100%;
-            
-            &:nth-child(even) {
-                margin: 0 10px;
-            }
-            
-            .image {
-                width: 100%;
-                margin: 5px 0;
+            flex-flow: row wrap;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 0 5px 5px;
+            margin: 0 auto;
 
-                &:first-child {
+            .img-wrapper {
+                display: flex;
+                width: calc(33% - 10px);
+                flex-flow: column wrap;
+                align-items: center;
+                justify-content: space-between;
+                height: 100%;
+                
+                &:nth-child(even) {
+                    margin: 0 10px;
+                }
+                
+                .image {
+                    width: 100%;
                     margin: 0 0 5px;
+                    position: relative;
+
+                    img {
+                        width: 100%;
+                    }
+
+                    &.true {
+
+                        &::before, &::after {
+                            content: "";
+                            display: inline-block;
+                            position: absolute;
+                        }
+
+                        &::before {
+                            height: 25px;
+                            width: 25px;
+                            left: 3px;
+                            top: 3px;
+                            border: 1px solid #4D555F;
+                            background: #282c34;
+                            border-radius: 50%;
+                        }
+
+                        &::after {
+                            height: 6px;
+                            width: 14px;
+                            left: 9px;
+                            top: 10px;
+                            border-left: 2px solid #4D555F;
+                            border-bottom: 2px solid #4D555F;
+                            transform: rotate(-45deg);
+                        }
+                    }
                 }
             }
         }
@@ -186,28 +235,6 @@
         justify-content: center;
         background: rgba(0, 0, 0, 0.5);
 
-        .button {
-            position: absolute;
-            top: 1%;
-            left: 1%;
-
-            button {
-                border: none;
-                background: #282c34;
-                color: #4D555F;
-                // width: 100px;
-                // height: 20px;
-                border-radius: 5px;
-                padding: 8px;
-                font-size: 14px;
-                font-weight: bold;
-
-                @media (min-width: 768px) {
-                    font-size: 18px;
-                }
-            }
-        }
-
         img {
             max-height: 100%;
             max-width: 100%;
@@ -218,26 +245,28 @@
   
     // Accounts for scroll wheel on desktop.
     @media (min-width: 768px) {
-        .img-container {
-            padding: 0 17px 17px;
-            
-            img {
-                width: 100%;
-                margin: 10px 0;
-                display: border-box;
+        .main {
+            .img-container {
+                padding: 0 17px 17px;
+                
+                img {
+                    width: 100%;
+                    margin: 10px 0;
+        
+                    &:first-child {
+                        margin: 0 0 10px;
+                    }
+                }
     
-                &:first-child {
-                    margin: 0 0 10px;
+                .img-wrapper {
+                    width: calc(33% - 12px);
+    
+                    &:nth-child(even) {
+                        margin: 0 20px;
+                    }
                 }
             }
 
-            .img-wrapper {
-                width: calc(33% - 12px);
-
-                &:nth-child(even) {
-                    margin: 0 20px;
-                }
-            }
         }
     }
 }

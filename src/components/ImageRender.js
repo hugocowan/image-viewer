@@ -175,19 +175,19 @@ class ImageRender extends React.Component {
     render() {
 
         return (
-            <div>
+            <div className={`main ${this.props.makeFixed}`}>
                 <div className='img-container'>
                     {this.state.columns.map((col, i) => {
                         return <div key={i} className='img-wrapper' ref={c => this[`col${i}`] = c}>
                             {col.map(imageLink =>
+                            <div className={`image ${imageLink} ${this.props.imagesForDeletion.includes(imageLink)}`} alt={`From ${imageLink}`} key={imageLink}>
                                 <img
                                     onLoad={this.onImgLoad}
                                     alt={`From ${imageLink}`}
-                                    key={imageLink}
-                                    className={`image ${imageLink}`}
                                     src={`${this.props.apiURL}:5001/media/thumbnails/${imageLink}`}
-                                    onClick ={() => this.props.handleSelectedImageChange(imageLink)}
+                                    onClick ={() => this.props.handleSelectedImage(imageLink)}
                                 />
+                            </div>
                             )}
                     </div>})}
                 </div>

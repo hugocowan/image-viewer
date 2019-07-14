@@ -34,7 +34,7 @@ class Navbar extends React.Component {
             body: imageForm,
         })
             .then(res => res.json())
-            .then(res => {
+            .then(() => {
                 setTimeout(() => {
                     const images = this.props.images;
                     for (let i = 0; i < files.length; i++) images.push(files[i].name);
@@ -44,12 +44,33 @@ class Navbar extends React.Component {
             .catch(err => console.log('error:', err));
     };
 
+    handleDelete = () => {
+        fetch(`${this.props.apiURL}:5001/api/delete`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ filenames: this.props.imagesForDeletion })
+        });
+
+        const images = this.props.images;
+        this.props.imagesForDeletion.forEach(img => images.splice(images.indexOf(img), 1));
+        this.props.onImageChange(images);
+        this.props.toggleDelete();
+    }
+
     render() {
 
-        const { handleSortChange, sortType, enableDelete, toggleDelete } = this.props;
+        const { 
+            handleSortChange, sortType,
+            enableDelete, toggleDelete, 
+            imagesForDeletion, 
+            makeFixed, toggleMakeFixed
+        } = this.props;
 
         return (
-            <nav>
+            <nav className={`${makeFixed || enableDelete}`}>
                 <this.renderBurger />
                 {this.state.showNav &&
                     <ul>
@@ -65,6 +86,12 @@ class Navbar extends React.Component {
                                 onClick={() => this.setState({ context: 'files' })}
                             >
                                 Files
+                            </li>
+                            <li
+                                className={`${makeFixed}`}
+                                onClick={toggleMakeFixed}
+                            >
+                                Fix Navbar
                             </li>
                         </div>}
                         
@@ -104,6 +131,13 @@ class Navbar extends React.Component {
                                     onChange={this.uploadImage} 
                                 />
                             </li>
+                            {enableDelete && 
+                            <li
+                                className={'delete'} 
+                                onClick={this.handleDelete}
+                            >
+                                Delete {imagesForDeletion.length} images
+                            </li>}
                             <li 
                                 className={`${enableDelete}`} 
                                 onClick={toggleDelete}

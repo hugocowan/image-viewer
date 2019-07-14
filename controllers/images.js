@@ -45,10 +45,13 @@ function uploadRoute(req, res, next) {
 
 function deleteRoute(req, res, next) {
 
-    fs.unlinkSync(`./src/assets/${req.body.filename}`);
-    fs.unlinkSync(`./src/assets/thumbnails/${req.body.filename}`);
+    req.body.filenames.forEach(filename => {
+    
+        fs.unlinkSync(`./src/assets/${filename}`);
+        fs.unlinkSync(`./src/assets/thumbnails/${filename}`);
+    });
 
-    res.json({ message: 'Image deleted' });
+    res.json({ message: 'Image(s) deleted' });
 }
 
 module.exports = {
