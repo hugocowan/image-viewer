@@ -27,8 +27,7 @@ class Navbar extends React.Component {
 
         let imageForm = new FormData();
 
-        imageForm.append('imageName', 'file');
-        imageForm.append('imageData', files[0]);
+        for (let i = 0; i < files.length; i++) imageForm.append('imageData', files[i]);
 
         fetch(`${this.props.apiURL}:5001/api/upload`, {
             method: 'POST',
@@ -37,11 +36,10 @@ class Navbar extends React.Component {
             .then(res => res.json())
             .then(res => {
                 setTimeout(() => {
-                    
                     const images = this.props.images;
-                    images.push(files[0].name);
+                    for (let i = 0; i < files.length; i++) images.push(files[i].name);
                     this.props.onImageChange(images);
-                }, 1000);
+                }, 200 * files.length);
             })
             .catch(err => console.log('error:', err));
     };
@@ -99,7 +97,9 @@ class Navbar extends React.Component {
                                 <label htmlFor="file-upload" className="custom-file-upload">Upload</label>
                                 <input 
                                     id="file-upload" 
-                                    type='file' 
+                                    type='file'
+                                    name="imageData"
+                                    multiple
                                     accept=".png, .jpg, .gif, .jpeg"
                                     onChange={this.uploadImage} 
                                 />

@@ -48,7 +48,7 @@ class ImageRender extends React.Component {
         this.props.updateDone();
 
         this.setState({ columns, sortType: this.props.sortType }, () => 
-            this.onImgLoad({ target: false }, true));
+            this.onImgLoad({ target: false }, true, 500));
     }
     
     // Ensure image column heights <= biggest image height:
@@ -60,7 +60,7 @@ class ImageRender extends React.Component {
     // Update the new column sizes.
     // Check again until the column height difference <= max image height.
     // Once the columns are leveled out, set state with the new column arrays.
-    onImgLoad = ({ target }, override = false) => {
+    onImgLoad = ({ target }, override = false, delay = null) => {
         
         let { loadedImages, sorted, columns } = this.state, { images } = this.props;
         if (target) this.observer.observe(target);
@@ -156,16 +156,21 @@ class ImageRender extends React.Component {
 
                 // Set state with the finalised column arrays.
                 this.setState({ columns: [ col0, col1, col2 ], loadedImages: loadedImages + 1, sorted: true });
-            }, 500);
+            }, delay || 1000);
 
         } else if (loadedImages < images.length) this.setState({ loadedImages: loadedImages + 1 });
     };
 
     // When an image enters/leaves the viewport, set the src to be thumbnail/full image
-    handleIntersection = entries =>
-        entries.forEach(entry =>
-            entry.intersectionRatio > 0 ? entry.target.src = `${this.props.apiURL}:5001/media/${entry.target.classList[1]}`
-            : entry.target.src = `${this.props.apiURL}:5001/media/thumbnails/${entry.target.classList[1]}`);
+    handleIntersection = entries => {
+        
+        entries.forEach(entry => {
+            const fileName = entry.target.alt.replace('From ', '');
+            entry.intersectionRatio > 0 ? entry.target.src = `${this.props.apiURL}:5001/media/${fileName}`
+            : entry.target.src = `${this.props.apiURL}:5001/media/thumbnails/${fileName}`;
+    
+        })
+    }
 
     render() {
 

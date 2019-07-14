@@ -23,16 +23,16 @@ const storage = multer.diskStorage({
     }
 });
 
-const uploadMain = multer({ storage }).single('imageData');
-
+const upload = multer({ storage }).array('imageData');
 
 function uploadRoute(req, res, next) {
-        
-    uploadMain(req, res, err => {
+    
+    upload(req, res, (err) => {
 
-        sharp(req.file.path)
-            .resize({ width: 100 })
-            .toFile('./src/assets/thumbnails/' + path.basename(req.file.originalname));
+        req.files.forEach(file =>
+            sharp(file.path)
+                .resize({ width: 100 })
+                .toFile('./src/assets/thumbnails/' + path.basename(file.originalname)))
 
         if (err) {
             res.json({ message: err });
