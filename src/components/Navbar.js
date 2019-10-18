@@ -100,21 +100,21 @@ class Navbar extends React.Component {
                             <li 
                             className={`${sortType === 'shuffle'}`} 
                             onClick={() => handleSortChange('shuffle')}
-                        >
+                            >
                             Shuffle
-                        </li>
-                        <li 
-                            className={`${sortType === 'natural'}`} 
-                            onClick={() => handleSortChange('natural')}
-                        >
-                            Natural
-                        </li>
-                        <li 
-                            className={`${sortType === 'naturalReverse'}`} 
-                            onClick={() => handleSortChange('naturalReverse')}
-                        >
-                            Natural Reverse
-                        </li>
+                            </li>
+                            <li 
+                                className={`${sortType === 'natural'}`} 
+                                onClick={() => handleSortChange('natural')}
+                            >
+                                Natural
+                            </li>
+                            <li 
+                                className={`${sortType === 'naturalReverse'}`} 
+                                onClick={() => handleSortChange('naturalReverse')}
+                            >
+                                Natural Reverse
+                            </li>
                         </div>
                         } 
                         
