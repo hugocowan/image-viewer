@@ -166,6 +166,11 @@ class ImageRender extends React.Component {
     handleIntersection = entries => {
         
         entries.forEach(entry => {
+
+            // If images are displayed with <= 230 pixel width, leave as thumbnails.
+            if (entry.target.clientWidth <= 230) return;
+
+            // Replace thumbnails with full size imagery when image enters viewport.
             const fileName = entry.target.alt.replace('From ', '');
             entry.intersectionRatio > 0 ? entry.target.src = `${this.props.apiURL}:5001/media/${fileName}`
             : entry.target.src = `${this.props.apiURL}:5001/media/thumbnails/${fileName}`;
