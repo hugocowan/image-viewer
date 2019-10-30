@@ -64,7 +64,7 @@ class ImageRender extends React.Component {
         
         let { loadedImages, sorted, columns } = this.state, { images } = this.props;
 
-        // if (target) this.observer.observe(target);
+        if (target) this.observer.observe(target);
 
         if (override === false && sorted) return;
         
