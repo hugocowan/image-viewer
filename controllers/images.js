@@ -1,6 +1,7 @@
 const path = require("path");
 const multer = require('multer');
 const sharp = require('sharp');
+const gifResize = require('@gumlet/gif-resize');
 const fs = require('fs');
 
 function indexRoute(req, res, next) {
@@ -29,10 +30,28 @@ function uploadRoute(req, res, next) {
     
     upload(req, res, (err) => {
 
-        req.files.forEach(file =>
-            sharp(file.path)
+        req.files.forEach(file => {
+
+            if (file.mimetype.includes('gif')) {
+
+                const buf = fs.readFileSync(file.path);
+                gifResize({
+                    width: 100
+                })(buf).then(data => {
+                    const stream = fs.createWriteStream('./src/assets/thumbnails/' + path.basename(file.originalname));
+                    stream.write(data);
+                    stream.end();
+                })
+                .catch(err => console.log('error:', err));
+
+            } else {
+
+                sharp(file.path)
                 .resize({ width: 100 })
-                .toFile('./src/assets/thumbnails/' + path.basename(file.originalname)))
+                .toFile('./src/assets/thumbnails/' + path.basename(file.originalname));
+            }
+            
+        });
 
         if (err) {
             res.json({ message: err });
@@ -45,13 +64,21 @@ function uploadRoute(req, res, next) {
 
 function deleteRoute(req, res, next) {
 
-    req.body.filenames.forEach(filename => {
-    
-        fs.unlinkSync(`./src/assets/${filename}`);
-        fs.unlinkSync(`./src/assets/thumbnails/${filename}`);
-    });
+    try {
+        
+        req.body.filenames.forEach(filename => {
+        
+            fs.unlinkSync(`./src/assets/${filename}`);
+            fs.unlinkSync(`./src/assets/thumbnails/${filename}`);
+        });
 
-    res.json({ message: 'Image(s) deleted' });
+        res.json({ message: 'Image(s) deleted' });
+
+    } catch(err) {
+        next(err);
+    }
+
+
 }
 
 module.exports = {

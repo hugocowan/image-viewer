@@ -28,7 +28,7 @@ class ImageRender extends React.Component {
         this.col2Height = 0;
 
         // Use the observer to keep track of each image's location
-        this.observer = new IntersectionObserver(this.handleIntersection);
+        this.observer = new IntersectionObserver(this.handleIntersection, {});
     }
 
     componentDidUpdate() {
@@ -63,7 +63,8 @@ class ImageRender extends React.Component {
     onImgLoad = ({ target }, override = false, delay = null) => {
         
         let { loadedImages, sorted, columns } = this.state, { images } = this.props;
-        if (target) this.observer.observe(target);
+
+        // if (target) this.observer.observe(target);
 
         if (override === false && sorted) return;
         
@@ -180,7 +181,11 @@ class ImageRender extends React.Component {
                     {this.state.columns.map((col, i) => {
                         return <div key={i} className='img-wrapper' ref={c => this[`col${i}`] = c}>
                             {col.map(imageLink =>
-                            <div className={`image ${imageLink} ${this.props.imagesForDeletion.includes(imageLink)}`} alt={`From ${imageLink}`} key={imageLink}>
+                            <div 
+                                className={`image ${imageLink} ${this.props.imagesForDeletion.includes(imageLink)}`} 
+                                alt={`From ${imageLink}`} 
+                                key={imageLink}
+                            >
                                 <img
                                     onLoad={this.onImgLoad}
                                     alt={`From ${imageLink}`}
