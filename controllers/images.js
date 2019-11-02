@@ -38,7 +38,7 @@ function uploadRoute(req, res, next) {
                 gifResize({
                     width: 100
                 })(buf).then(data => {
-                    const stream = fs.createWriteStream(`./src/assets/thumbnails/${path.basename(file.originalname)}-live`);
+                    const stream = fs.createWriteStream(`./src/assets/thumbnails/live-${path.basename(file.originalname)}`);
                     stream.write(data);
                     stream.end();
                 })
@@ -70,7 +70,7 @@ function deleteRoute(req, res, next) {
         
             fs.unlinkSync(`./src/assets/${filename}`);
             fs.unlinkSync(`./src/assets/thumbnails/${filename}`);
-            fs.unlinkSync(`./src/assets/thumbnails/${filename}-live`);
+            fs.unlinkSync(`./src/assets/thumbnails/live-${filename}`);
         });
 
         res.json({ message: 'Image(s) deleted' });

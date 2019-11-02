@@ -59,14 +59,19 @@ class App extends React.Component {
 
     handleSelectedImage = src => {
 
+        let filename = src;
+
         if (!this.state.enableDelete) {
 
-            this.setState({ selectedImage: src });
+            this.setState({ selectedImage: filename });
             return;  
         }
 
         const delImgs = [ ...this.state.imagesForDeletion ];
-        delImgs.includes(src) ? delImgs.splice(delImgs.indexOf(src), 1) : delImgs.push(src);
+
+        if (filename.slice(0, 4) === 'live-') filename = filename.substring(5);
+
+        delImgs.includes(filename) ? delImgs.splice(delImgs.indexOf(filename), 1) : delImgs.push(filename);
         this.setState({ imagesForDeletion: delImgs });
     }
 

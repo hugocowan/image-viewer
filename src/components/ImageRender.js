@@ -26,6 +26,7 @@ class ImageRender extends React.Component {
         this.col0Height = 0;
         this.col1Height = 0;
         this.col2Height = 0;
+        this.marginBottom = null;
 
         // Use the observer to keep track of each image's location
         this.observer = new IntersectionObserver(this.handleIntersection, {});
@@ -74,19 +75,27 @@ class ImageRender extends React.Component {
                 // Make a copy of the image column arrays, initialise other vars.
                 const columnChildren = [ this.col0.children, this.col1.children, this.col2.children ];
 
+                if (this.marginBottom === null) {
+                    this.marginBottom = parseInt(window.getComputedStyle(columnChildren[0][0]).marginBottom);
+                }
+
+                
                 let [ col0, col1, col2 ] = [ ...columns ],
                 col0Heights = [], col1Heights = [], col2Heights = [];
                 
-                // Get individual image sizes from each column's HTMLCollection of images, in order. Also get max image height.
+                // Get individual image sizes + margin from each column's HTMLCollection of images.
                 columnChildren.forEach((column, i) => {
                     for (let j = 0; j < column.length; j++) {
                         
-                        i === 0 ? col0Heights.push(column[j].clientHeight) :
-                        i === 1 ? col1Heights.push(column[j].clientHeight) :
-                            col2Heights.push(column[j].clientHeight);
+                        i === 0 ? col0Heights.push(column[j].clientHeight + this.marginBottom) :
+                        i === 1 ? col1Heights.push(column[j].clientHeight + this.marginBottom) :
+                        col2Heights.push(column[j].clientHeight + this.marginBottom);
                     }
                 });
 
+                console.log(col0Heights.reduce((a, b) => a + b));
+
+                // Get max image height.
                 let maxHeight = Math.max(
                     col0Heights[col0Heights.length - 1], 
                     col1Heights[col1Heights.length - 1],
@@ -119,7 +128,7 @@ class ImageRender extends React.Component {
                     }
                 };
 
-                // Move image from larger to smaller column, update column and image heights.
+                // Move image from larger to smaller column, update column and image heights. + 5 for margin.
                 const moveImage = (smallCol, smallColHeight, smallColHeights, bigCol, bigColHeights, bigColHeight) => {
 
                     smallCol.push(bigCol.pop());
@@ -132,6 +141,22 @@ class ImageRender extends React.Component {
                         col2Heights[col2Heights.length - 1],
                     );
                 };
+
+                /*
+                    1. Get heights of each of the three images at the bottom of each column.
+                    2. Get heights of each column.
+                    3. Check whether moving the smallest image would make the columns more equal in size.
+                    4. Move the smallest image to the column that gives the best equality.
+                    5. If moving the smallest image would make the columns less/as equal than before, break the while loop.
+                */
+
+                if (override) {
+
+
+                }
+
+                // console.log(override, this.col0Height, this.col0, this.col0.lastChild);
+
 
                 // While diff between columns > max image height, keep moving images.
                 while ( Math.abs(this.col0Height - this.col1Height) > maxHeight ||
@@ -167,13 +192,25 @@ class ImageRender extends React.Component {
         
         entries.forEach(entry => {
 
-            // If images are displayed with <= 230 pixel width, leave as thumbnails.
-            if (entry.target.clientWidth <= 230) return;
-
             // Replace thumbnails with full size imagery when image enters viewport.
             const fileName = entry.target.alt.replace('From ', '');
-            entry.intersectionRatio > 0 ? entry.target.src = `${this.props.apiURL}:5001/media/${fileName}`
-            : entry.target.src = `${this.props.apiURL}:5001/media/thumbnails/${fileName}`;
+
+            if (entry.intersectionRatio > 0) {
+
+                // If we're on a mobile in portrait mode, load live thumbnails of gifs.
+                if (entry.target.clientWidth <= 127 && fileName.includes('.gif')) {
+
+                    entry.target.src = `${this.props.apiURL}:5001/media/thumbnails/live-${fileName}`;
+                
+                }  else {
+
+                    entry.target.src = `${this.props.apiURL}:5001/media/${fileName}`;
+                } 
+
+            } else if (entry.target.clientWidth > 127) {
+
+                entry.target.src = `${this.props.apiURL}:5001/media/thumbnails/${fileName}`;
+            }
     
         })
     }
