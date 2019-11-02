@@ -38,18 +38,18 @@ function uploadRoute(req, res, next) {
                 gifResize({
                     width: 100
                 })(buf).then(data => {
-                    const stream = fs.createWriteStream('./src/assets/thumbnails/' + path.basename(file.originalname));
+                    const stream = fs.createWriteStream(`./src/assets/thumbnails/${path.basename(file.originalname)}-live`);
                     stream.write(data);
                     stream.end();
                 })
-                .catch(err => console.log('error:', err));
+                .catch(err => console.log('error resizing gif:', err));
 
-            } else {
-
-                sharp(file.path)
-                .resize({ width: 100 })
-                .toFile('./src/assets/thumbnails/' + path.basename(file.originalname));
             }
+
+            sharp(file.path)
+            .resize({ width: 100 })
+            .toFile('./src/assets/thumbnails/' + path.basename(file.originalname))
+            .catch(err => console.log('error resizing image:', err));
             
         });
 
@@ -70,12 +70,15 @@ function deleteRoute(req, res, next) {
         
             fs.unlinkSync(`./src/assets/${filename}`);
             fs.unlinkSync(`./src/assets/thumbnails/${filename}`);
+            fs.unlinkSync(`./src/assets/thumbnails/${filename}-live`);
         });
 
         res.json({ message: 'Image(s) deleted' });
 
-    } catch(err) {
-        next(err);
+    } catch (err) {
+        
+        console.log('error in deleteRoute:', err);
+        res.json({ message: err });
     }
 
 

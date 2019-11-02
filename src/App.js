@@ -3,6 +3,7 @@ import './App.scss';
 import Modal from './components/Modal';
 import Navbar from './components/Navbar';
 import ImageRender from './components/ImageRender';
+import { shuffle, naturalSort } from './lib/Sort';
 
 class App extends React.Component {
 
@@ -28,45 +29,9 @@ class App extends React.Component {
             },
         })
             .then(res => res.json())
-            .then(data => this.setState({ images: this.shuffle(data.files) }))
+            .then(data => this.setState({ images: shuffle(data.files) }))
             .catch(err => console.log('error:', err));
     }
-
-    shuffle = (array) => {
-        let currentIndex = array.length, temporaryValue, randomIndex;
-      
-        // While there remain elements to shuffle...
-        while (0 !== currentIndex) {
-      
-          // Pick a remaining element...
-          randomIndex = Math.floor(Math.random() * currentIndex);
-          currentIndex -= 1;
-      
-          // And swap it with the current element.
-          temporaryValue = array[currentIndex];
-          array[currentIndex] = array[randomIndex];
-          array[randomIndex] = temporaryValue;
-        }
-      
-        return array;
-    };
-
-    naturalSort = (a, b) => {
-                
-        const ax = [], bx = [];
-
-        a.replace(/(\d+)|(\D+)/g, function(_, $1, $2) { ax.push([$1 || Infinity, $2 || ""]) });
-        b.replace(/(\d+)|(\D+)/g, function(_, $1, $2) { bx.push([$1 || Infinity, $2 || ""]) });
-        
-        while (ax.length && bx.length) {
-            let an = ax.shift();
-            let bn = bx.shift();
-            let nn = (an[0] - bn[0]) || an[1].localeCompare(bn[1]);
-            if(nn) return nn;
-        }
-    
-        return ax.length - bx.length;
-    };
 
     handleSortChange = (sortType) => {
     
@@ -74,15 +39,15 @@ class App extends React.Component {
 
         switch(sortType) {
             case 'shuffle' :
-                images = this.shuffle(images);
+                images = shuffle(images);
                 break;
             
             case 'natural' :
-                images.sort(this.naturalSort);
+                images.sort(naturalSort);
                 break;
             
             case 'naturalReverse' : 
-                images.sort(this.naturalSort).reverse();
+                images.sort(naturalSort).reverse();
                 break;
 
             default: break;
