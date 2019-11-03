@@ -181,7 +181,7 @@ class ImageRender extends React.Component {
 
             }
 
-            let bestMove = null;
+            let bestMove = [];
 
             while (bestMove !== false) {
 
