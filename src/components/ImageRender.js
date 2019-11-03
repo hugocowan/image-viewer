@@ -81,7 +81,23 @@ class ImageRender extends React.Component {
                 5. If moving the smallest image would make the columns less/as equal than before, break the while loop.
             */
 
-            let [ col0, col1, col2 ] = [ ...columns ], smallestColumn, heights = {}, bestMove = [];
+            let [ col0, col1, col2 ] = [ ...columns ], smallestColumn, heights = {};
+
+            // Only run this if we haven't got all image heights mapped out.
+            if (this.heightMap.size !== images.length) {
+
+                // Make a copy of the image column arrays.
+                const columnChildren = [ this.col0.children, this.col1.children, this.col2.children ],
+                    marginBottom = parseInt(window.getComputedStyle(columnChildren[0][0]).marginBottom);
+
+                // Get individual image sizes + margin from each column's HTMLCollection of images.
+                columnChildren.forEach((column, i) => {
+                    for (let j = 0; j < column.length; j++) {
+
+                        this.heightMap.set(column[j].firstChild.title, column[j].clientHeight + marginBottom);
+                    }
+                });
+            }
 
             const calcDiff = (heightA, heightB, heightC) => {
                 return (
@@ -119,30 +135,45 @@ class ImageRender extends React.Component {
                 Object.keys(heights).forEach(column => {
                     if (heights[column].height === smallestSize) smallestColumn = column;
                 });
-
             }
+
+            calcHeights(this.state.columns);
 
             const checkBestMove = (colA, colB, colC) => {
 
-                let newColAHeight = heights[colA].height + heights[colB].imgHeight;
+                let newColAHeightA = heights[colA].height + heights[colB].imgHeight;
                 let newColBHeight = heights[colB].height - heights[colB].imgHeight;
+
+                let colBChangeDiff = (
+                    Math.abs(newColBHeight - heights[colC].height) +
+                    Math.abs(heights[colC].height - newColAHeightA) +
+                    Math.abs(newColAHeightA - newColBHeight)
+                ) / 3
+
+                let newColAHeightB = heights[colA].height + heights[colC].imgHeight;
                 let newColCHeight = heights[colC].height - heights[colC].imgHeight;
 
-                let colBChangeDiff = calcDiff(newColAHeight, newColBHeight, heights[colC].height);
+                let colCChangeDiff = (
+                    Math.abs(heights[colB].height - newColCHeight) +
+                    Math.abs(newColCHeight - newColAHeightB) +
+                    Math.abs(newColAHeightB - heights[colB].height)
+                ) / 3
 
-                newColAHeight = heights[colA].height + heights[colC].imgHeight;
-
-                let colCChangeDiff = calcDiff(newColAHeight, heights[colB].height, newColCHeight); 
                 
-                newColAHeight = heights[colA].height + heights[colB].imgHeight + heights[colC].imgHeight;
+                let newColAHeightC = heights[colA].height + heights[colB].imgHeight + heights[colC].imgHeight;
                 newColBHeight = heights[colB].height - heights[colB].imgHeight;
                 newColCHeight = heights[colC].height - heights[colC].imgHeight;
 
-                let bothChangeDiff = calcDiff(newColAHeight, newColBHeight, newColCHeight);
+                let bothChangeDiff = (
+                    Math.abs(newColBHeight - newColCHeight) +
+                    Math.abs(newColCHeight - newColAHeightC) +
+                    Math.abs(newColAHeightC - newColBHeight)
+                ) / 3
 
                 const [ colToChange, bestValue ] = (colBChangeDiff < colCChangeDiff && colBChangeDiff < bothChangeDiff) ? [colB, colBChangeDiff] :
                        (colCChangeDiff < colBChangeDiff && colCChangeDiff < bothChangeDiff) ? [colC, colCChangeDiff] :
                        ['both', bothChangeDiff];
+
 
                 if (bestValue >= heights.avgDifference) return false;
 
@@ -152,42 +183,13 @@ class ImageRender extends React.Component {
 
             let bestMove = [];
 
-            //         default:
-            //             break;
-            //     }
-
-            //     calcHeights([col0, col1, col2]);
-            // };
-
-            // Only run this if we haven't got all image heights mapped out.
-            if (this.heightMap.size !== images.length) {
-
-                // Make a copy of the image column arrays.
-                const columnChildren = [ this.col0.children, this.col1.children, this.col2.children ],
-                    marginBottom = parseInt(window.getComputedStyle(columnChildren[0][0]).marginBottom);
-
-                // Get individual image sizes + margin from each column's HTMLCollection of images.
-                columnChildren.forEach((column, i) => {
-                    for (let j = 0; j < column.length; j++) {
-
-                        this.heightMap.set(column[j].firstChild.title, column[j].clientHeight + marginBottom);
-                    }
-                });
-            }
-
-            calcHeights(this.state.columns);
-
-            let counter = 0;
-
-            while (bestMove !== false && counter < 100) {
-
-                counter++;
+            while (bestMove !== false) {
 
                 switch(smallestColumn) {
                     case 'column0': 
-
-                        // moveImage('column0', 'column1', 'column2', col0, col1, col2);
-
+    
+                        bestMove = checkBestMove('column0', 'column1', 'column2');
+    
                         if (bestMove === false) break;
     
                         switch(bestMove[0]) {
