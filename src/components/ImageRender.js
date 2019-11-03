@@ -141,39 +141,25 @@ class ImageRender extends React.Component {
 
             const checkBestMove = (colA, colB, colC) => {
 
-                let newColAHeightA = heights[colA].height + heights[colB].imgHeight;
+                let newColAHeight = heights[colA].height + heights[colB].imgHeight;
                 let newColBHeight = heights[colB].height - heights[colB].imgHeight;
-
-                let colBChangeDiff = (
-                    Math.abs(newColBHeight - heights[colC].height) +
-                    Math.abs(heights[colC].height - newColAHeightA) +
-                    Math.abs(newColAHeightA - newColBHeight)
-                ) / 3
-
-                let newColAHeightB = heights[colA].height + heights[colC].imgHeight;
                 let newColCHeight = heights[colC].height - heights[colC].imgHeight;
 
-                let colCChangeDiff = (
-                    Math.abs(heights[colB].height - newColCHeight) +
-                    Math.abs(newColCHeight - newColAHeightB) +
-                    Math.abs(newColAHeightB - heights[colB].height)
-                ) / 3
+                let colBChangeDiff = calcDiff(newColAHeight, newColBHeight, heights[colC].height);
 
+                newColAHeight = heights[colA].height + heights[colC].imgHeight;
+
+                let colCChangeDiff = calcDiff(newColAHeight, heights[colB].height, newColCHeight); 
                 
-                let newColAHeightC = heights[colA].height + heights[colB].imgHeight + heights[colC].imgHeight;
+                newColAHeight = heights[colA].height + heights[colB].imgHeight + heights[colC].imgHeight;
                 newColBHeight = heights[colB].height - heights[colB].imgHeight;
                 newColCHeight = heights[colC].height - heights[colC].imgHeight;
 
-                let bothChangeDiff = (
-                    Math.abs(newColBHeight - newColCHeight) +
-                    Math.abs(newColCHeight - newColAHeightC) +
-                    Math.abs(newColAHeightC - newColBHeight)
-                ) / 3
+                let bothChangeDiff = calcDiff(newColAHeight, newColBHeight, newColCHeight);
 
                 const [ colToChange, bestValue ] = (colBChangeDiff < colCChangeDiff && colBChangeDiff < bothChangeDiff) ? [colB, colBChangeDiff] :
                        (colCChangeDiff < colBChangeDiff && colCChangeDiff < bothChangeDiff) ? [colC, colCChangeDiff] :
                        ['both', bothChangeDiff];
-
 
                 if (bestValue >= heights.avgDifference) return false;
 
