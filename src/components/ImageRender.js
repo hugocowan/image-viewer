@@ -274,9 +274,11 @@ class ImageRender extends React.Component {
             if (entry.intersectionRatio > 0) {
 
                 // If we're on a mobile in portrait mode, load live thumbnails of gifs.
-                if (entry.target.clientWidth <= 127 && fileName.includes('.gif')) {
+                if (entry.target.clientWidth <= 127) {
 
-                    entry.target.src = `${this.props.apiURL}:5001/media/thumbnails/live-${fileName}`;
+                    entry.target.src = fileName.includes('.gif') ? 
+                        `${this.props.apiURL}:5001/media/thumbnails/live-${fileName}` : 
+                        `${this.props.apiURL}:5001/media/thumbnails/${fileName}`;
                 
                 }  else {
 
