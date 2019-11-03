@@ -271,14 +271,14 @@ class ImageRender extends React.Component {
 
             if (entry.isIntersecting) {
 
-                if (entry.target.clientWidth > 127 && entry.target.src.includes('/thumbnails/')) {
+                if (entry.target.clientWidth > 230 && entry.target.src.includes('/thumbnails/')) {
 
                     entry.target.src = `${this.props.apiURL}:5001/media/${fileName}`;
                 
                 } else {
 
 
-                    if (entry.target.clientWidth <= 127) {
+                    if (entry.target.clientWidth <= 230) {
 
                         entry.target.src = fileName.includes('.gif') ? 
                             `${this.props.apiURL}:5001/media/thumbnails/live-${fileName}` : 
@@ -291,7 +291,7 @@ class ImageRender extends React.Component {
 
             } else {
 
-                if (entry.target.clientWidth > 127 && entry.target.src.match(/live-.*gif/) !== null) {
+                if (entry.target.clientWidth > 230 && entry.target.src.match(/live-.*gif/) !== null) {
                     
                     entry.target.src = `${this.props.apiURL}:5001/media/thumbnails/live-${fileName}`;
                 

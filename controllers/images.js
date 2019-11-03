@@ -32,13 +32,15 @@ function uploadRoute(req, res, next) {
 
         req.files.forEach(file => {
 
+            const fileName = path.basename(file.originalname);
+
             if (file.mimetype.includes('gif')) {
 
                 const buf = fs.readFileSync(file.path);
                 gifResize({
                     width: 100
                 })(buf).then(data => {
-                    const stream = fs.createWriteStream(`./src/assets/thumbnails/live-${path.basename(file.originalname)}`);
+                    const stream = fs.createWriteStream(`./src/assets/thumbnails/live-${fileName}`);
                     stream.write(data);
                     stream.end();
                 })
@@ -47,8 +49,8 @@ function uploadRoute(req, res, next) {
             }
 
             sharp(file.path)
-            .resize({ width: 100 })
-            .toFile('./src/assets/thumbnails/' + path.basename(file.originalname))
+            .resize({ width: fileName.includes('.gif') ? 100 : fileName.includes('png') ? 200 : 600 })
+            .toFile('./src/assets/thumbnails/' + fileName)
             .catch(err => console.log('error resizing image:', err));
             
         });
