@@ -96,6 +96,8 @@ class ImageRender extends React.Component {
                         this.heightMap.set(column[j].firstChild.title, column[j].clientHeight + marginBottom);
                     }
                 });
+
+                console.log(this.heightMap);
             }
 
             const calcDiff = (heightA, heightB, heightC) => {
@@ -147,7 +149,7 @@ class ImageRender extends React.Component {
                     Math.abs(newColBHeight - heights[colC].height) +
                     Math.abs(heights[colC].height - newColAHeightA) +
                     Math.abs(newColAHeightA - newColBHeight)
-                ) / 3
+                ) / 3;
 
                 let newColAHeightB = heights[colA].height + heights[colC].imgHeight;
                 let newColCHeight = heights[colC].height - heights[colC].imgHeight;
@@ -156,7 +158,7 @@ class ImageRender extends React.Component {
                     Math.abs(heights[colB].height - newColCHeight) +
                     Math.abs(newColCHeight - newColAHeightB) +
                     Math.abs(newColAHeightB - heights[colB].height)
-                ) / 3
+                ) / 3;
 
                 
                 let newColAHeightC = heights[colA].height + heights[colB].imgHeight + heights[colC].imgHeight;
@@ -167,12 +169,13 @@ class ImageRender extends React.Component {
                     Math.abs(newColBHeight - newColCHeight) +
                     Math.abs(newColCHeight - newColAHeightC) +
                     Math.abs(newColAHeightC - newColBHeight)
-                ) / 3
+                ) / 3;
 
                 const [ colToChange, bestValue ] = (colBChangeDiff < colCChangeDiff && colBChangeDiff < bothChangeDiff) ? [colB, colBChangeDiff] :
                        (colCChangeDiff < colBChangeDiff && colCChangeDiff < bothChangeDiff) ? [colC, colCChangeDiff] :
                        ['both', bothChangeDiff];
 
+                console.log(smallestColumn, heights, colToChange, bestValue);
 
                 if (bestValue >= heights.avgDifference) return false;
 
