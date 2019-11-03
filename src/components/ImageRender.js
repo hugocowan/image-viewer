@@ -26,7 +26,8 @@ class ImageRender extends React.Component {
         this.col0Height = 0;
         this.col1Height = 0;
         this.col2Height = 0;
-        this.marginBottom = null;
+
+        this.heightMap = new Map();
 
         // Use the observer to keep track of each image's location
         this.observer = new IntersectionObserver(this.handleIntersection, {});
@@ -49,7 +50,7 @@ class ImageRender extends React.Component {
         this.props.updateDone();
 
         this.setState({ columns, sortType: this.props.sortType }, () => 
-            this.onImgLoad({ target: false }, true, 500));
+            this.onImgLoad({ target: false }, true));
     }
     
     // Ensure image column heights <= biggest image height:
@@ -61,128 +62,203 @@ class ImageRender extends React.Component {
     // Update the new column sizes.
     // Check again until the column height difference <= max image height.
     // Once the columns are leveled out, set state with the new column arrays.
-    onImgLoad = ({ target }, override = false, delay = null) => {
+    onImgLoad = ({ target }, override = false) => {
+
         
         let { loadedImages, sorted, columns } = this.state, { images } = this.props;
-
+        
         if (target) this.observer.observe(target);
 
         if (override === false && sorted) return;
         
         if (override || loadedImages >= images.length) {
 
-            setTimeout(() => {
-                // Make a copy of the image column arrays, initialise other vars.
-                const columnChildren = [ this.col0.children, this.col1.children, this.col2.children ];
+            /*
+                1. Get heights of each of the three images at the bottom of each column.
+                2. Get heights of each column, identify the smallest one.
+                3. Check what moving each image on either of the larger columns 
+                   would do to the column heights, and move the one that makes the best change.
+                5. If moving the smallest image would make the columns less/as equal than before, break the while loop.
+            */
 
-                if (this.marginBottom === null) {
-                    this.marginBottom = parseInt(window.getComputedStyle(columnChildren[0][0]).marginBottom);
-                }
+            let [ col0, col1, col2 ] = [ ...columns ], smallestColumn, heights = {};
 
-                
-                let [ col0, col1, col2 ] = [ ...columns ],
-                col0Heights = [], col1Heights = [], col2Heights = [];
-                
+            // Only run this if we haven't got all image heights mapped out.
+            if (this.heightMap.size !== images.length) {
+
+                // Make a copy of the image column arrays.
+                const columnChildren = [ this.col0.children, this.col1.children, this.col2.children ],
+                    marginBottom = parseInt(window.getComputedStyle(columnChildren[0][0]).marginBottom);
+
                 // Get individual image sizes + margin from each column's HTMLCollection of images.
                 columnChildren.forEach((column, i) => {
                     for (let j = 0; j < column.length; j++) {
-                        
-                        i === 0 ? col0Heights.push(column[j].clientHeight + this.marginBottom) :
-                        i === 1 ? col1Heights.push(column[j].clientHeight + this.marginBottom) :
-                        col2Heights.push(column[j].clientHeight + this.marginBottom);
+
+                        this.heightMap.set(column[j].firstChild.title, column[j].clientHeight + marginBottom);
                     }
                 });
+            }
 
-                console.log(col0Heights.reduce((a, b) => a + b));
+            const calcDiff = (heightA, heightB, heightC) => {
+                return (
+                    Math.abs(heightA - heightB) +
+                    Math.abs(heightB - heightC) +
+                    Math.abs(heightC - heightA)
+                ) / 3;
+            }
 
-                // Get max image height.
-                let maxHeight = Math.max(
-                    col0Heights[col0Heights.length - 1], 
-                    col1Heights[col1Heights.length - 1],
-                    col2Heights[col2Heights.length - 1],
-                );
+            const calcHeights = (columns) => {
 
-                if (Math.min(col0Heights.length, col1Heights.length, col2Heights.length) === 0) return;
+                heights = { 
+                    column0: { height: 0, imgHeight: 0 },
+                    column1: { height: 0, imgHeight: 0 },
+                    column2: { height: 0, imgHeight: 0 },
+                    avgDifference: 0
+                };
+
+                // Get the current height of each column by adding up image heights.
+                columns.forEach((column, i) => {
+                    column.forEach((image, j) => {
+                        const imgHeight = this.heightMap.get(image);
+                        i === 0 ? heights.column0.height += imgHeight :
+                        i === 1 ? heights.column1.height += imgHeight :
+                        heights.column2.height += imgHeight;
+
+                        if (j === column.length - 1) heights[`column${i}`].imgHeight = imgHeight;
+                    });                    
+                });
+
+                heights.avgDifference = calcDiff(heights.column0.height, heights.column1.height, heights.column2.height);
+
+                let smallestSize = Math.min(heights.column1.height, heights.column2.height, heights.column0.height);
+
+                Object.keys(heights).forEach(column => {
+                    if (heights[column].height === smallestSize) smallestColumn = column;
+                });
+            }
+
+            calcHeights(this.state.columns);
+
+            const checkBestMove = (colA, colB, colC) => {
+
+                let newColAHeightA = heights[colA].height + heights[colB].imgHeight;
+                let newColBHeight = heights[colB].height - heights[colB].imgHeight;
+
+                let colBChangeDiff = (
+                    Math.abs(newColBHeight - heights[colC].height) +
+                    Math.abs(heights[colC].height - newColAHeightA) +
+                    Math.abs(newColAHeightA - newColBHeight)
+                ) / 3
+
+                let newColAHeightB = heights[colA].height + heights[colC].imgHeight;
+                let newColCHeight = heights[colC].height - heights[colC].imgHeight;
+
+                let colCChangeDiff = (
+                    Math.abs(heights[colB].height - newColCHeight) +
+                    Math.abs(newColCHeight - newColAHeightB) +
+                    Math.abs(newColAHeightB - heights[colB].height)
+                ) / 3
+
                 
-                // Get the current height of each column by adding up the image heights.
-                this.col0Height = col0Heights.reduce((a, b) => a + b);
-                this.col1Height = col1Heights.reduce((a, b) => a + b);
-                this.col2Height = col2Heights.reduce((a, b) => a + b);
+                let newColAHeightC = heights[colA].height + heights[colB].imgHeight + heights[colC].imgHeight;
+                newColBHeight = heights[colB].height - heights[colB].imgHeight;
+                newColCHeight = heights[colC].height - heights[colC].imgHeight;
 
-                // Find the smallest column to add an image to.
-                const findSmallestColumn = (col, colHeights, colHeight) => {
-                    
-                    switch(Math.min(this.col0Height, this.col1Height, this.col2Height)) {
+                let bothChangeDiff = (
+                    Math.abs(newColBHeight - newColCHeight) +
+                    Math.abs(newColCHeight - newColAHeightC) +
+                    Math.abs(newColAHeightC - newColBHeight)
+                ) / 3
 
-                        case this.col0Height:
-                            moveImage(col0, 'col0Height', col0Heights, col, colHeights, colHeight);
-                            break;
-
-                        case this.col1Height:
-                            moveImage(col1, 'col1Height', col1Heights, col, colHeights, colHeight);
-                            break;
-
-                        default:
-                            moveImage(col2, 'col2Height', col2Heights, col, colHeights, colHeight);
-                            break;
-                    }
-                };
-
-                // Move image from larger to smaller column, update column and image heights. + 5 for margin.
-                const moveImage = (smallCol, smallColHeight, smallColHeights, bigCol, bigColHeights, bigColHeight) => {
-
-                    smallCol.push(bigCol.pop());
-                    smallColHeights.push(bigColHeights.pop());
-                    this[smallColHeight] = smallColHeights.reduce((a, b) => a + b);
-                    this[bigColHeight] = bigColHeights.reduce((a, b) => a + b);
-                    maxHeight = Math.max(
-                        col0Heights[col0Heights.length - 1], 
-                        col1Heights[col1Heights.length - 1],
-                        col2Heights[col2Heights.length - 1],
-                    );
-                };
-
-                /*
-                    1. Get heights of each of the three images at the bottom of each column.
-                    2. Get heights of each column.
-                    3. Check whether moving the smallest image would make the columns more equal in size.
-                    4. Move the smallest image to the column that gives the best equality.
-                    5. If moving the smallest image would make the columns less/as equal than before, break the while loop.
-                */
-
-                if (override) {
+                const [ colToChange, bestValue ] = (colBChangeDiff < colCChangeDiff && colBChangeDiff < bothChangeDiff) ? [colB, colBChangeDiff] :
+                       (colCChangeDiff < colBChangeDiff && colCChangeDiff < bothChangeDiff) ? [colC, colCChangeDiff] :
+                       ['both', bothChangeDiff];
 
 
+                if (bestValue >= heights.avgDifference) return false;
+
+                return [ colToChange, bestValue ];
+
+            }
+
+            let bestMove = null;
+
+            while (bestMove !== false) {
+
+                switch(smallestColumn) {
+                    case 'column0': 
+    
+                        bestMove = checkBestMove('column0', 'column1', 'column2');
+    
+                        if (bestMove === false) break;
+    
+                        switch(bestMove[0]) {
+                            
+                            case 'column1':
+                                col0.push(col1.pop());
+                                break;
+                            
+                            case 'column2':
+                                col0.push(col2.pop());
+                                break;
+    
+                            default:
+                                col0.push(col1.pop(), col2.pop());
+                        }
+
+                        calcHeights([col0, col1, col2]);
+    
+                        break;
+    
+                    case 'column1': 
+    
+                        bestMove = checkBestMove('column1', 'column0', 'column2');
+    
+                        if (bestMove === false) break;
+    
+                        switch(bestMove[0]) {
+                            
+                            case 'column0':
+                                col1.push(col0.pop());
+                                break;
+                            
+                            case 'column2':
+                                col1.push(col2.pop());
+                                break;
+    
+                            default:
+                                col1.push(col0.pop(), col2.pop());
+                        }
+
+                        calcHeights([col0, col1, col2]);
+    
+                        break;
+    
+                    default: 
+                        bestMove = checkBestMove('column2', 'column0', 'column1');
+    
+                        if (bestMove === false) break;
+    
+                        switch(bestMove[0]) {
+                            
+                            case 'column0':
+                                col2.push(col0.pop());
+                                break;
+                            
+                            case 'column1':
+                                col2.push(col1.pop());
+                                break;
+    
+                            default:
+                                col2.push(col0.pop(), col1.pop());
+                        }
+
+                        calcHeights([col0, col1, col2]);
                 }
+            }
 
-                // console.log(override, this.col0Height, this.col0, this.col0.lastChild);
-
-
-                // While diff between columns > max image height, keep moving images.
-                while ( Math.abs(this.col0Height - this.col1Height) > maxHeight ||
-                        Math.abs(this.col1Height - this.col2Height) > maxHeight ||
-                        Math.abs(this.col2Height - this.col0Height) > maxHeight  ) 
-                {
-                    // Find the largest column to take an image from.
-                    switch(Math.max(this.col0Height, this.col1Height, this.col2Height)) {
-
-                        case this.col0Height: 
-                            findSmallestColumn(col0, col0Heights, 'col0Height');
-                            break;
-
-                        case this.col1Height: 
-                            findSmallestColumn(col1, col1Heights, 'col1Height');
-                            break;
-
-                        default:
-                            findSmallestColumn(col2, col2Heights, 'col2Height');
-                            break;
-                    }
-                }
-
-                // Set state with the finalised column arrays.
-                this.setState({ columns: [ col0, col1, col2 ], loadedImages: loadedImages + 1, sorted: true });
-            }, delay || 1000);
+            // Set state with the finalised column arrays.
+            this.setState({ columns: [ col0, col1, col2 ], loadedImages: loadedImages + 1, sorted: true });
 
         } else if (loadedImages < images.length) this.setState({ loadedImages: loadedImages + 1 });
     };
@@ -230,6 +306,7 @@ class ImageRender extends React.Component {
                             >
                                 <img
                                     onLoad={this.onImgLoad}
+                                    title={imageLink}
                                     alt={`From ${imageLink}`}
                                     src={`${this.props.apiURL}:5001/media/thumbnails/${imageLink}`}
                                     onClick ={() => this.props.handleSelectedImage(imageLink)}
