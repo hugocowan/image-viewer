@@ -120,7 +120,6 @@ class ImageRender extends React.Component {
                     if (heights[column].height === smallestSize) smallestColumn = column;
                 });
 
-                console.log(heights);
             }
 
             const checkBestMove = (colA, colB, colC) => {
@@ -151,32 +150,30 @@ class ImageRender extends React.Component {
 
             }
 
-            const moveImage = (a, b, c, colA, colB, colC) => {
+            // const moveImage = (a, b, c, colA, colB, colC) => {
 
-                console.log('hey!');
+            //     bestMove = checkBestMove(a, b, c);
 
-                bestMove = checkBestMove(a, b, c);
-
-                switch(bestMove[0]) {
+            //     switch(bestMove[0]) {
                             
-                    case colB:
-                        colA.push(colB.pop());
-                        break;
+            //         case colB:
+            //             colA.push(colB.pop());
+            //             break;
                     
-                    case colC:
-                        colA.push(colC.pop());
-                        break;
+            //         case colC:
+            //             colA.push(colC.pop());
+            //             break;
 
-                    case 'both':
-                        colA.push(colB.pop(), colC.pop());
-                        break;
+            //         case 'both':
+            //             colA.push(colB.pop(), colC.pop());
+            //             break;
 
-                    default:
-                        break;
-                }
+            //         default:
+            //             break;
+            //     }
 
-                calcHeights([col0, col1, col2]);
-            };
+            //     calcHeights([col0, col1, col2]);
+            // };
 
             // Only run this if we haven't got all image heights mapped out.
             if (this.heightMap.size !== images.length) {
