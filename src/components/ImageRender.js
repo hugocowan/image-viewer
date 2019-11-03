@@ -75,7 +75,7 @@ class ImageRender extends React.Component {
 
                 setTimeout(() => {
                     this.onImgLoad(false, true)
-                }, 1000);
+                }, 100);
             }
 
             let [ col0, col1, col2 ] = [ ...columns ], smallestColumn, heights = {}, bestMove = [];
