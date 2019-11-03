@@ -19,15 +19,9 @@ class ImageRender extends React.Component {
             columns,
             sorted: false,
             loadedImages: 0,
+            firstTime: true,
             sortType: props.sortType,
         };
-
-        // Declare colHeight vars here so they can be referenced anywhere.
-        this.col0Height = 0;
-        this.col1Height = 0;
-        this.col2Height = 0;
-
-        this.heightMap = new Map();
 
         // Use the observer to keep track of each image's location
         this.observer = new IntersectionObserver(this.handleIntersection);
@@ -53,62 +47,53 @@ class ImageRender extends React.Component {
             this.onImgLoad({ target: false }, true));
     }
     
-    // Ensure image column heights <= biggest image height:
-    // Wait for images to load.
-    // Make copies of each column array so we aren't manipulating state constantly.
-    // Get individual image sizes from each column, and the size of the biggest image.
-    // If diff between column heights > max image height, move an image.
-    // Move image from biggest column to smallest column.
-    // Update the new column sizes.
-    // Check again until the column height difference <= max image height.
-    // Once the columns are leveled out, set state with the new column arrays.
+    /*
+        1. Get heights of each of the three images at the bottom of each column.
+        2. Get heights of each column, identify the smallest one.
+        3. Check what moving each image on either of the larger columns 
+            would do to the column heights, and move the one that makes the best change.
+        5. If moving the smallest image would make the columns less/as equal than before, break the while loop.
+    */
     onImgLoad = ({ target }, override = false) => {
         
         let { loadedImages, sorted, columns } = this.state, { images } = this.props;
-        
+
+        // Add images to the observer as their onload functions fire.
         if (target) this.observer.observe(target);
 
+        // If images are already sorted, don't run this again.
         if (override === false && sorted) return;
         
+        // Only run sorting when all images have loaded.
         if (override || loadedImages >= images.length) {
 
-            /*
-                1. Get heights of each of the three images at the bottom of each column.
-                2. Get heights of each column, identify the smallest one.
-                3. Check what moving each image on either of the larger columns 
-                   would do to the column heights, and move the one that makes the best change.
-                5. If moving the smallest image would make the columns less/as equal than before, break the while loop.
-            */
+            // Work around to resolve the first sort not going as planned - 
+            // image height data can be wrong on first page load.
+            if (this.state.firstTime) {
 
-            let [ col0, col1, col2 ] = [ ...columns ], smallestColumn, heights = {};
+                this.setState({ firstTime: false });
 
-            // Only run this if we haven't got all image heights mapped out.
-            if (this.heightMap.size !== images.length) {
+                setTimeout(() => {
+                    this.onImgLoad(false, true)
+                }, 1000);
+            }
+
+            let [ col0, col1, col2 ] = [ ...columns ], smallestColumn, heights = {}, bestMove = [];
+
+            const calcHeights = (_columns) => {
 
                 // Make a copy of the image column arrays.
                 const columnChildren = [ this.col0.children, this.col1.children, this.col2.children ],
-                    marginBottom = parseInt(window.getComputedStyle(columnChildren[0][0]).marginBottom);
+                    marginBottom = parseInt(window.getComputedStyle(columnChildren[0][0]).marginBottom),
+                    heightMap = new Map();
 
                 // Get individual image sizes + margin from each column's HTMLCollection of images.
                 columnChildren.forEach((column, i) => {
                     for (let j = 0; j < column.length; j++) {
 
-                        this.heightMap.set(column[j].firstChild.title, column[j].clientHeight + marginBottom);
+                        heightMap.set(column[j].firstChild.title, column[j].clientHeight + marginBottom);
                     }
                 });
-
-                console.log(this.heightMap);
-            }
-
-            const calcDiff = (heightA, heightB, heightC) => {
-                return (
-                    Math.abs(heightA - heightB) +
-                    Math.abs(heightB - heightC) +
-                    Math.abs(heightC - heightA)
-                ) / 3;
-            }
-
-            const calcHeights = (columns) => {
 
                 heights = { 
                     column0: { height: 0, imgHeight: 0 },
@@ -118,9 +103,9 @@ class ImageRender extends React.Component {
                 };
 
                 // Get the current height of each column by adding up image heights.
-                columns.forEach((column, i) => {
+                _columns.forEach((column, i) => {
                     column.forEach((image, j) => {
-                        const imgHeight = this.heightMap.get(image);
+                        const imgHeight = heightMap.get(image);
                         i === 0 ? heights.column0.height += imgHeight :
                         i === 1 ? heights.column1.height += imgHeight :
                         heights.column2.height += imgHeight;
@@ -129,18 +114,20 @@ class ImageRender extends React.Component {
                     });                    
                 });
 
-                heights.avgDifference = calcDiff(heights.column0.height, heights.column1.height, heights.column2.height);
+                heights.avgDifference = (
+                    Math.abs(heights.column1.height - heights.column2.height) +
+                    Math.abs(heights.column2.height - heights.column0.height) +
+                    Math.abs(heights.column0.height - heights.column1.height)
+                ) / 3;
 
                 let smallestSize = Math.min(heights.column1.height, heights.column2.height, heights.column0.height);
 
                 Object.keys(heights).forEach(column => {
                     if (heights[column].height === smallestSize) smallestColumn = column;
                 });
-            }
+            };
 
-            calcHeights(this.state.columns);
-
-            const checkBestMove = (colA, colB, colC) => {
+            const calcBestMove = (colA, colB, colC) => {
 
                 let newColAHeightA = heights[colA].height + heights[colB].imgHeight;
                 let newColBHeight = heights[colB].height - heights[colB].imgHeight;
@@ -175,22 +162,20 @@ class ImageRender extends React.Component {
                        (colCChangeDiff < colBChangeDiff && colCChangeDiff < bothChangeDiff) ? [colC, colCChangeDiff] :
                        ['both', bothChangeDiff];
 
-                console.log(smallestColumn, heights, colToChange, bestValue);
-
                 if (bestValue >= heights.avgDifference) return false;
 
                 return [ colToChange, bestValue ];
 
-            }
+            };
 
-            let bestMove = [];
+            calcHeights(columns);
 
             while (bestMove !== false) {
 
                 switch(smallestColumn) {
                     case 'column0': 
     
-                        bestMove = checkBestMove('column0', 'column1', 'column2');
+                        bestMove = calcBestMove('column0', 'column1', 'column2');
     
                         if (bestMove === false) break;
     
@@ -214,7 +199,7 @@ class ImageRender extends React.Component {
     
                     case 'column1': 
     
-                        bestMove = checkBestMove('column1', 'column0', 'column2');
+                        bestMove = calcBestMove('column1', 'column0', 'column2');
     
                         if (bestMove === false) break;
     
@@ -237,7 +222,7 @@ class ImageRender extends React.Component {
                         break;
     
                     default: 
-                        bestMove = checkBestMove('column2', 'column0', 'column1');
+                        bestMove = calcBestMove('column2', 'column0', 'column1');
     
                         if (bestMove === false) break;
     
