@@ -63,7 +63,6 @@ class ImageRender extends React.Component {
     // Check again until the column height difference <= max image height.
     // Once the columns are leveled out, set state with the new column arrays.
     onImgLoad = ({ target }, override = false) => {
-
         
         let { loadedImages, sorted, columns } = this.state, { images } = this.props;
         
@@ -268,12 +267,12 @@ class ImageRender extends React.Component {
         
         entries.forEach(entry => {
 
-            // Replace thumbnails with full size imagery when image enters viewport.
             const fileName = entry.target.alt.replace('From ', '');
+            
+            // Check if image is in viewport.
+            if (entry.intersectionRect.height > 0) {
 
-            if (entry.intersectionRatio > 0) {
-
-                // If we're on a mobile in portrait mode, load live thumbnails of gifs.
+                // If we're on a mobile in portrait mode, load only thumbnails + live gif thumbnails.
                 if (entry.target.clientWidth <= 127) {
 
                     entry.target.src = fileName.includes('.gif') ? 
@@ -285,6 +284,7 @@ class ImageRender extends React.Component {
                     entry.target.src = `${this.props.apiURL}:5001/media/${fileName}`;
                 } 
 
+            // If we're on a larger screen, load full image.
             } else if (entry.target.clientWidth > 127) {
 
                 entry.target.src = `${this.props.apiURL}:5001/media/thumbnails/${fileName}`;
