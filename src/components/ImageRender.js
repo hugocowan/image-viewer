@@ -81,23 +81,7 @@ class ImageRender extends React.Component {
                 5. If moving the smallest image would make the columns less/as equal than before, break the while loop.
             */
 
-            let [ col0, col1, col2 ] = [ ...columns ], smallestColumn, heights = {};
-
-            // Only run this if we haven't got all image heights mapped out.
-            if (this.heightMap.size !== images.length) {
-
-                // Make a copy of the image column arrays.
-                const columnChildren = [ this.col0.children, this.col1.children, this.col2.children ],
-                    marginBottom = parseInt(window.getComputedStyle(columnChildren[0][0]).marginBottom);
-
-                // Get individual image sizes + margin from each column's HTMLCollection of images.
-                columnChildren.forEach((column, i) => {
-                    for (let j = 0; j < column.length; j++) {
-
-                        this.heightMap.set(column[j].firstChild.title, column[j].clientHeight + marginBottom);
-                    }
-                });
-            }
+            let [ col0, col1, col2 ] = [ ...columns ], smallestColumn, heights = {}, bestMove = [];
 
             const calcDiff = (heightA, heightB, heightC) => {
                 return (
@@ -135,9 +119,9 @@ class ImageRender extends React.Component {
                 Object.keys(heights).forEach(column => {
                     if (heights[column].height === smallestSize) smallestColumn = column;
                 });
-            }
 
-            calcHeights(this.state.columns);
+                console.log(heights);
+            }
 
             const checkBestMove = (colA, colB, colC) => {
 
@@ -167,15 +151,62 @@ class ImageRender extends React.Component {
 
             }
 
-            let bestMove = null;
+            const moveImage = (a, b, c, colA, colB, colC) => {
 
-            while (bestMove !== false) {
+                console.log('hey!');
+
+                bestMove = checkBestMove(a, b, c);
+
+                switch(bestMove[0]) {
+                            
+                    case colB:
+                        colA.push(colB.pop());
+                        break;
+                    
+                    case colC:
+                        colA.push(colC.pop());
+                        break;
+
+                    case 'both':
+                        colA.push(colB.pop(), colC.pop());
+                        break;
+
+                    default:
+                        break;
+                }
+
+                calcHeights([col0, col1, col2]);
+            };
+
+            // Only run this if we haven't got all image heights mapped out.
+            if (this.heightMap.size !== images.length) {
+
+                // Make a copy of the image column arrays.
+                const columnChildren = [ this.col0.children, this.col1.children, this.col2.children ],
+                    marginBottom = parseInt(window.getComputedStyle(columnChildren[0][0]).marginBottom);
+
+                // Get individual image sizes + margin from each column's HTMLCollection of images.
+                columnChildren.forEach((column, i) => {
+                    for (let j = 0; j < column.length; j++) {
+
+                        this.heightMap.set(column[j].firstChild.title, column[j].clientHeight + marginBottom);
+                    }
+                });
+            }
+
+            calcHeights(this.state.columns);
+
+            let counter = 0;
+
+            while (bestMove !== false && counter < 100) {
+
+                counter++;
 
                 switch(smallestColumn) {
                     case 'column0': 
-    
-                        bestMove = checkBestMove('column0', 'column1', 'column2');
-    
+
+                        // moveImage('column0', 'column1', 'column2', col0, col1, col2);
+
                         if (bestMove === false) break;
     
                         switch(bestMove[0]) {
