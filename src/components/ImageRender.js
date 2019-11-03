@@ -30,7 +30,7 @@ class ImageRender extends React.Component {
         this.heightMap = new Map();
 
         // Use the observer to keep track of each image's location
-        this.observer = new IntersectionObserver(this.handleIntersection, {});
+        this.observer = new IntersectionObserver(this.handleIntersection);
     }
 
     componentDidUpdate() {
@@ -268,28 +268,37 @@ class ImageRender extends React.Component {
         entries.forEach(entry => {
 
             const fileName = entry.target.alt.replace('From ', '');
-            
-            // Check if image is in viewport.
-            if (entry.intersectionRect.height > 0) {
 
-                // If we're on a mobile in portrait mode, load only thumbnails + live gif thumbnails.
-                if (entry.target.clientWidth <= 127) {
+            if (entry.isIntersecting) {
 
-                    entry.target.src = fileName.includes('.gif') ? 
-                        `${this.props.apiURL}:5001/media/thumbnails/live-${fileName}` : 
-                        `${this.props.apiURL}:5001/media/thumbnails/${fileName}`;
-                
-                }  else {
+                if (entry.target.clientWidth > 127 && entry.target.src.includes('/thumbnails/')) {
 
                     entry.target.src = `${this.props.apiURL}:5001/media/${fileName}`;
-                } 
+                
+                } else {
 
-            // If we're on a larger screen, load full image.
-            } else if (entry.target.clientWidth > 127) {
 
-                entry.target.src = `${this.props.apiURL}:5001/media/thumbnails/${fileName}`;
+                    if (entry.target.clientWidth <= 127) {
+
+                        entry.target.src = fileName.includes('.gif') ? 
+                            `${this.props.apiURL}:5001/media/thumbnails/live-${fileName}` : 
+                            `${this.props.apiURL}:5001/media/thumbnails/${fileName}`;
+                        
+                    } else {
+                        entry.target.src = `${this.props.apiURL}:5001/media/thumbnails/${fileName}`;
+                    }
+                }
+
+            } else {
+
+                if (entry.target.clientWidth > 127 && entry.target.src.match(/live-.*gif/) !== null) {
+                    
+                    entry.target.src = `${this.props.apiURL}:5001/media/thumbnails/live-${fileName}`;
+                
+                } else {
+                    entry.target.src = `${this.props.apiURL}:5001/media/thumbnails/${fileName}`;
+                }
             }
-    
         })
     }
 
