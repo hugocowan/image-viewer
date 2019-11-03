@@ -15,6 +15,7 @@ class App extends React.Component {
             makeFixed: false,
             sortType: 'shuffle',
             updateNeeded: false,
+            error: false,
             selectedImage: '',
             enableDelete: false,
             imagesForDeletion: [],
@@ -30,7 +31,7 @@ class App extends React.Component {
         })
             .then(res => res.json())
             .then(data => this.setState({ images: shuffle(data.files) }))
-            .catch(err => console.log('error:', err));
+            .catch(err => this.setState({error: err.message}));
     }
 
     handleSortChange = (sortType) => {
@@ -84,8 +85,8 @@ class App extends React.Component {
     render() {
 
         if (this.state.images === null) return ( 
-            <div className="App">
-                Loading...
+            <div className={`App ${!!this.state.error}`}>
+                {this.state.error || 'Loading...'}
             </div>
         );
         

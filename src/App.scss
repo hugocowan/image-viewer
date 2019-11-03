@@ -4,6 +4,10 @@
     overflow-x: hidden;
     user-select: none;
 
+    &.true {
+        color: red;
+    }
+
     nav {
         height: 47px;
         overflow: none;
