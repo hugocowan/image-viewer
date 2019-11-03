@@ -150,23 +150,7 @@ class ImageRender extends React.Component {
 
             }
 
-            // const moveImage = (a, b, c, colA, colB, colC) => {
-
-            //     bestMove = checkBestMove(a, b, c);
-
-            //     switch(bestMove[0]) {
-                            
-            //         case colB:
-            //             colA.push(colB.pop());
-            //             break;
-                    
-            //         case colC:
-            //             colA.push(colC.pop());
-            //             break;
-
-            //         case 'both':
-            //             colA.push(colB.pop(), colC.pop());
-            //             break;
+            let bestMove = [];
 
             //         default:
             //             break;
