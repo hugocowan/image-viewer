@@ -75,25 +75,27 @@ class ImageRender extends React.Component {
 
                 setTimeout(() => {
                     this.onImgLoad(false, true)
-                }, 100);
+                }, 1000);
             }
 
-            let [ col0, col1, col2 ] = [ ...columns ], smallestColumn, heights = {}, bestMove = [];
+            let [ col0, col1, col2 ] = [ ...columns ], smallestCol, heights = {}, bestMove = [];
 
             const calcHeights = (_columns) => {
 
                 // Make a copy of the image column arrays.
                 const columnChildren = [ this.col0.children, this.col1.children, this.col2.children ],
                     marginBottom = parseInt(window.getComputedStyle(columnChildren[0][0]).marginBottom),
-                    heightMap = new Map();
+                    heightMap = {};
 
                 // Get individual image sizes + margin from each column's HTMLCollection of images.
                 columnChildren.forEach((column, i) => {
                     for (let j = 0; j < column.length; j++) {
 
-                        heightMap.set(column[j].firstChild.title, column[j].clientHeight + marginBottom);
+                        heightMap[column[j].firstChild.title] = column[j].clientHeight + marginBottom;
                     }
                 });
+
+                console.log(heightMap, Object.values(heightMap).reduce((a,b) => a + b));
 
                 heights = { 
                     column0: { height: 0, imgHeight: 0 },
@@ -105,7 +107,7 @@ class ImageRender extends React.Component {
                 // Get the current height of each column by adding up image heights.
                 _columns.forEach((column, i) => {
                     column.forEach((image, j) => {
-                        const imgHeight = heightMap.get(image);
+                        const imgHeight = heightMap[image];
                         i === 0 ? heights.column0.height += imgHeight :
                         i === 1 ? heights.column1.height += imgHeight :
                         heights.column2.height += imgHeight;
@@ -123,7 +125,7 @@ class ImageRender extends React.Component {
                 let smallestSize = Math.min(heights.column1.height, heights.column2.height, heights.column0.height);
 
                 Object.keys(heights).forEach(column => {
-                    if (heights[column].height === smallestSize) smallestColumn = column;
+                    if (heights[column].height === smallestSize) smallestCol = column;
                 });
             };
 
@@ -170,9 +172,12 @@ class ImageRender extends React.Component {
 
             calcHeights(columns);
 
-            while (bestMove !== false) {
+            let counter = 0;
 
-                switch(smallestColumn) {
+            while (bestMove !== false && counter < 100) {
+
+                counter++;
+                switch(smallestCol) {
                     case 'column0': 
     
                         bestMove = calcBestMove('column0', 'column1', 'column2');
@@ -242,6 +247,8 @@ class ImageRender extends React.Component {
 
                         calcHeights([col0, col1, col2]);
                 }
+
+                console.log(counter, smallestCol, bestMove, heights);
             }
 
             // Set state with the finalised column arrays.
