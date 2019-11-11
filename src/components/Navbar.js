@@ -1,7 +1,7 @@
 import React from 'react';
 
 class Navbar extends React.Component {
-    
+
     constructor (props) {
         super(props);
 
@@ -12,8 +12,8 @@ class Navbar extends React.Component {
     }
 
     renderBurger = () => {
-        return <div 
-            className={`burger ${this.state.showNav} context-${!!this.state.context}`} 
+        return <div
+            className={`burger ${this.state.showNav} context-${!!this.state.context}`}
             onClick={() => this.state.context ? this.setState({ context: null }) :
                 this.setState({ showNav: !this.state.showNav })}
             >
@@ -45,6 +45,7 @@ class Navbar extends React.Component {
     };
 
     handleDelete = () => {
+
         fetch(`${this.props.apiURL}:5001/api/delete`, {
             method: 'POST',
             headers: {
@@ -52,20 +53,22 @@ class Navbar extends React.Component {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ filenames: this.props.imagesForDeletion })
-        });
+        })
+            .then(res => console.log(res.json()))
+            .catch(err => console.log('Error deleting:', err));
 
         const images = this.props.images;
         this.props.imagesForDeletion.forEach(img => images.splice(images.indexOf(img), 1));
         this.props.onImageChange(images);
         this.props.toggleDelete();
-    }
+    };
 
     render() {
 
-        const { 
+        const {
             handleSortChange, sortType,
-            enableDelete, toggleDelete, 
-            imagesForDeletion, 
+            enableDelete, toggleDelete,
+            imagesForDeletion,
             makeFixed, toggleMakeFixed
         } = this.props;
 
@@ -94,52 +97,52 @@ class Navbar extends React.Component {
                                 Fix Navbar
                             </li>
                         </div>}
-                        
+
                         {this.state.context === 'sorting' &&
                         <div>
-                            <li 
-                            className={`${sortType === 'shuffle'}`} 
+                            <li
+                            className={`${sortType === 'shuffle'}`}
                             onClick={() => handleSortChange('shuffle')}
                             >
                             Shuffle
                             </li>
-                            <li 
-                                className={`${sortType === 'natural'}`} 
+                            <li
+                                className={`${sortType === 'natural'}`}
                                 onClick={() => handleSortChange('natural')}
                             >
                                 Natural
                             </li>
-                            <li 
-                                className={`${sortType === 'naturalReverse'}`} 
+                            <li
+                                className={`${sortType === 'naturalReverse'}`}
                                 onClick={() => handleSortChange('naturalReverse')}
                             >
                                 Natural Reverse
                             </li>
                         </div>
-                        } 
-                        
+                        }
+
                         {this.state.context === 'files' &&
                         <div>
                             <li>
                                 <label htmlFor="file-upload" className="custom-file-upload">Upload</label>
-                                <input 
-                                    id="file-upload" 
+                                <input
+                                    id="file-upload"
                                     type='file'
                                     name="imageData"
                                     multiple
                                     accept=".png, .jpg, .gif, .jpeg"
-                                    onChange={this.uploadImage} 
+                                    onChange={this.uploadImage}
                                 />
                             </li>
-                            {enableDelete && 
+                            {enableDelete &&
                             <li
-                                className={'delete'} 
+                                className={'delete'}
                                 onClick={this.handleDelete}
                             >
                                 Delete {imagesForDeletion.length} images
                             </li>}
-                            <li 
-                                className={`${enableDelete}`} 
+                            <li
+                                className={`${enableDelete}`}
                                 onClick={toggleDelete}
                             >
                                 {!enableDelete && 'Enable Deleting'}

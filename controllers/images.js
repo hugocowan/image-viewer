@@ -27,12 +27,12 @@ const storage = multer.diskStorage({
 const upload = multer({ storage }).array('imageData');
 
 function uploadRoute(req, res, next) {
-    
+
     upload(req, res, (err) => {
 
         req.files.forEach(file => {
 
-            const fileName = path.basename(file.originalname);
+            const filename = path.basename(file.originalname);
 
             if (file.mimetype.includes('gif')) {
 
@@ -40,7 +40,7 @@ function uploadRoute(req, res, next) {
                 gifResize({
                     width: 100
                 })(buf).then(data => {
-                    const stream = fs.createWriteStream(`./src/assets/thumbnails/live-${fileName}`);
+                    const stream = fs.createWriteStream(`./src/assets/thumbnails/live-${filename}`);
                     stream.write(data);
                     stream.end();
                 })
@@ -49,10 +49,10 @@ function uploadRoute(req, res, next) {
             }
 
             sharp(file.path)
-            .resize({ width: fileName.includes('.gif') ? 100 : fileName.includes('png') ? 200 : 600 })
-            .toFile('./src/assets/thumbnails/' + fileName)
+            .resize({ width: filename.includes('.gif') ? 100 : filename.includes('png') ? 200 : 600 })
+            .toFile('./src/assets/thumbnails/' + filename)
             .catch(err => console.log('error resizing image:', err));
-            
+
         });
 
         if (err) {
@@ -67,18 +67,18 @@ function uploadRoute(req, res, next) {
 function deleteRoute(req, res, next) {
 
     try {
-        
+
         req.body.filenames.forEach(filename => {
-        
+
             fs.unlinkSync(`./src/assets/${filename}`);
             fs.unlinkSync(`./src/assets/thumbnails/${filename}`);
-            fs.unlinkSync(`./src/assets/thumbnails/live-${filename}`);
+            if (filename.slice(-4) === '.gif') fs.unlinkSync(`./src/assets/thumbnails/live-${filename}`);
         });
 
         res.json({ message: 'Image(s) deleted' });
 
     } catch (err) {
-        
+
         console.log('error in deleteRoute:', err);
         res.json({ message: err });
     }
