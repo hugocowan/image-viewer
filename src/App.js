@@ -40,7 +40,7 @@ class App extends React.Component {
             .catch(err => this.setState({error: err.message}));
     }
 
-    handleSortChange = (sortType) => {
+    handleSortChange = sortType => {
 
         let images = [ ...this.state.images ];
 
@@ -96,8 +96,7 @@ class App extends React.Component {
             </div>
         );
 
-        return (
-            <div className="App">
+        return <div className="App">
                 <Navbar
                     apiURL={this.state.apiURL}
                     handleSortChange={this.handleSortChange}
@@ -128,8 +127,7 @@ class App extends React.Component {
                     updateNeeded={this.state.updateNeeded}
                     updateDone={() => this.setState({ updateNeeded: false })}
                 />
-            </div>
-        );
+            </div>;
     }
 }
 

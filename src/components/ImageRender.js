@@ -83,7 +83,7 @@ class ImageRender extends React.Component {
             };
 
             // Get height data for each of the columns
-            const calcHeights = (_columns) => {
+            const calcHeights = _columns => {
 
                 // Make array containing references to all image elements.
                 const columnChildren = [ this.col0.children, this.col1.children, this.col2.children ],
@@ -153,55 +153,52 @@ class ImageRender extends React.Component {
 
                 bestMove = colBChangeDiff === smallestDiff ? colB : colCChangeDiff === smallestDiff ? colC : 'both';
 
-                console.log(colBChangeDiff, colCChangeDiff, bothChangeDiff);
-                console.log(counter, 'smallestDiff:', smallestDiff, 'bestMove:', bestMove, heights);
+                // console.log(colBChangeDiff, colCChangeDiff, bothChangeDiff);
+                // console.log(counter, 'smallestDiff:', smallestDiff, 'bestMove:', bestMove, heights);
 
                 if (smallestDiff >= heights.avgDifference) {
                     bestMove = false;
                     return;
                 }
 
-                if (bestMove === 'col1' || bestMove === 'col2') {
+                if (bestMove === colB || bestMove === colC) {
 
-                    this[`_${heights.smallestCol}`].push(this[`_${bestMove}`].pop());
+                    this[`_${colA}`].push(this[`_${bestMove}`].pop());
 
                 } else if (bestMove === 'both') {
 
-                    let [ colA, colB ] = heights.smallestCol === 'col0' ? ['_col1', '_col2'] :
-                        heights.smallestCol === 'col1' ? ['_col0', '_col2'] :
-                        ['_col0', '_col1'];
-
-                    this[`_${heights.smallestCol}`].push(this[colA].pop(), this[colB].pop());
+                    this[`_${colA}`].push(this[`_${colB}`].pop(), this[`_${colC}`].pop());
                 }
 
                 calcHeights([this._col0, this._col1, this._col2]);
             };
 
-            checkColumns = () => new Promise(resolve => setTimeout(resolve, 1000))
-                .then(() => {
+            checkColumns = () => new Promise(resolve => {
 
-                    const oldHeights = JSON.stringify(heights);
-                    calcHeights(columns);
-                    return JSON.stringify(heights) === oldHeights;
-                })
-                .then((bool) => {
+                const oldHeights = JSON.stringify(heights);
+                calcHeights(columns);
+                console.log(JSON.stringify(heights) === oldHeights);
+                resolve(JSON.stringify(heights) === oldHeights);
+            })
+            .then(bool => {
 
-                    if (bool === false) {
-                        checkColumns();
-                        return;
-                    }
+                if (bool === false) {
+                    
+                    checkColumns(500);
+                    return;
+                }
 
-                    while (bestMove !== false && counter < 100) {
-                        counter++;
-                        makeBestMove();
-                    }
+                while (bestMove !== false && counter < 100) {
+                    counter++;
+                    makeBestMove();
+                }
 
-                    // Set state with the finalised column arrays.
-                    this.setState({
-                        columns: [this._col0, this._col1, this._col2],
-                        loadedImages: loadedImages + 1, sorting: false, sorted: true
-                    });
+                // Set state with the finalised column arrays.
+                this.setState({
+                    columns: [this._col0, this._col1, this._col2],
+                    loadedImages: loadedImages + 1, sorting: false, sorted: true
                 });
+            });
 
             calcHeights(columns);
             checkColumns();
