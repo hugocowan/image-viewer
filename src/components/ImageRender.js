@@ -181,7 +181,7 @@ class ImageRender extends React.Component {
 
                     if (bool === false) {
                         
-                        checkColumns(500);
+                        checkColumns(10);
                         return;
                     }
 
@@ -198,7 +198,7 @@ class ImageRender extends React.Component {
                 });
 
             calcHeights(columns);
-            checkColumns(500);
+            checkColumns(10);
 
 
         } else if (loadedImages < images.length) this.setState({ loadedImages: loadedImages + 1 });
