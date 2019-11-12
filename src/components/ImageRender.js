@@ -175,12 +175,12 @@ class ImageRender extends React.Component {
 
                     const oldHeights = JSON.stringify(heights);
                     calcHeights(columns);
+                    console.log(JSON.stringify(heights) === oldHeights);
                     return JSON.stringify(heights) === oldHeights;
                 })
                 .then(bool => {
 
                     if (bool === false) {
-                        
                         checkColumns(10);
                         return;
                     }
