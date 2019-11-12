@@ -70,7 +70,7 @@ class ImageRender extends React.Component {
 
             this.setState({ sorting: true });
 
-            let heights = {}, bestMove = undefined, counter = 0, checkColumns;
+            let heights = {}, bestMove = undefined, checkColumns;
             this._col0 = columns[0]; this._col1 = columns[1]; this._col2 = columns[2];
 
             // Get the average difference in height between each column of images.
@@ -149,10 +149,10 @@ class ImageRender extends React.Component {
 
                     smallestDiff = Math.min(colBChangeDiff, colCChangeDiff, bothChangeDiff);
 
+                    
+                    bestMove = colBChangeDiff === smallestDiff ? colB : colCChangeDiff === smallestDiff ? colC : 'both';
+                    
                 // If the smallest new average difference between columns >= the current avg distance, we're done.
-
-                bestMove = colBChangeDiff === smallestDiff ? colB : colCChangeDiff === smallestDiff ? colC : 'both';
-
                 if (smallestDiff >= heights.avgDifference) {
                     bestMove = false;
                     return;
@@ -162,7 +162,7 @@ class ImageRender extends React.Component {
 
                     this[`_${colA}`].push(this[`_${bestMove}`].pop());
 
-                } else if (bestMove === 'both') {
+                } else {
 
                     this[`_${colA}`].push(this[`_${colB}`].pop(), this[`_${colC}`].pop());
                 }
@@ -175,7 +175,6 @@ class ImageRender extends React.Component {
 
                     const oldHeights = JSON.stringify(heights);
                     calcHeights(columns);
-                    console.log(JSON.stringify(heights) === oldHeights);
                     return JSON.stringify(heights) === oldHeights;
                 })
                 .then(bool => {
@@ -185,8 +184,7 @@ class ImageRender extends React.Component {
                         return;
                     }
 
-                    while (bestMove !== false && counter < 100) {
-                        counter++;
+                    while (bestMove !== false) {
                         makeBestMove();
                     }
 
