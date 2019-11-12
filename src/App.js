@@ -97,37 +97,37 @@ class App extends React.Component {
         );
 
         return <div className="App">
-                <Navbar
-                    apiURL={this.state.apiURL}
-                    handleSortChange={this.handleSortChange}
-                    sortType={this.state.sortType}
-                    toggleDelete={this.toggleDelete}
-                    enableDelete={this.state.enableDelete}
-                    imagesForDeletion={this.state.imagesForDeletion}
-                    images={this.state.images}
-                    makeFixed={this.state.makeFixed}
-                    toggleMakeFixed={() => this.setState({ makeFixed: !this.state.makeFixed })}
-                    onImageChange={images => this.onImageChange(images)}
-                />
-                {this.state.selectedImage &&
-                <Modal
-                    apiURL={this.state.apiURL}
-                    images={this.state.images}
-                    imageLink={this.state.selectedImage}
-                    enableDelete={this.state.enableDelete}
-                    onImageChange={images => this.onImageChange(images)}
-                    onClick ={() => this.setState({ selectedImage: '' })}
-                />}
-                <ImageRender
-                    makeFixed={this.state.makeFixed}
-                    apiURL={this.state.apiURL}
-                    images={this.state.images}
-                    handleSelectedImage={src => this.handleSelectedImage(src)}
-                    imagesForDeletion={this.state.imagesForDeletion}
-                    updateNeeded={this.state.updateNeeded}
-                    updateDone={() => this.setState({ updateNeeded: false })}
-                />
-            </div>;
+            <Navbar
+                apiURL={this.state.apiURL}
+                handleSortChange={this.handleSortChange}
+                sortType={this.state.sortType}
+                toggleDelete={this.toggleDelete}
+                enableDelete={this.state.enableDelete}
+                imagesForDeletion={this.state.imagesForDeletion}
+                images={this.state.images}
+                makeFixed={this.state.makeFixed}
+                toggleMakeFixed={() => this.setState({ makeFixed: !this.state.makeFixed })}
+                onImageChange={images => this.onImageChange(images)}
+            />
+            {this.state.selectedImage &&
+            <Modal
+                apiURL={this.state.apiURL}
+                images={this.state.images}
+                imageLink={this.state.selectedImage}
+                enableDelete={this.state.enableDelete}
+                onImageChange={images => this.onImageChange(images)}
+                onClick ={() => this.setState({ selectedImage: '' })}
+            />}
+            <ImageRender
+                makeFixed={this.state.makeFixed}
+                apiURL={this.state.apiURL}
+                images={this.state.images}
+                handleSelectedImage={src => this.handleSelectedImage(src)}
+                imagesForDeletion={this.state.imagesForDeletion}
+                updateNeeded={this.state.updateNeeded}
+                updateDone={() => this.setState({ updateNeeded: false })}
+            />
+        </div>;
     }
 }
 

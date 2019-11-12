@@ -83,7 +83,7 @@ class ImageRender extends React.Component {
             };
 
             // Get height data for each of the columns
-            const calcHeights = (_columns) => {
+            const calcHeights = _columns => {
 
                 // Make array containing references to all image elements.
                 const columnChildren = [ this.col0.children, this.col1.children, this.col2.children ],
@@ -91,7 +91,7 @@ class ImageRender extends React.Component {
                     heightMap = {};
 
                 // Get individual image sizes + margin from each column's HTMLCollection of images.
-                columnChildren.forEach((column, i) => {
+                columnChildren.forEach(column => {
                     for (let j = 0; j < column.length; j++) {
 
                         heightMap[column[j].firstChild.title] = column[j].clientHeight + marginBottom;
@@ -153,9 +153,6 @@ class ImageRender extends React.Component {
 
                 bestMove = colBChangeDiff === smallestDiff ? colB : colCChangeDiff === smallestDiff ? colC : 'both';
 
-                // console.log(colBChangeDiff, colCChangeDiff, bothChangeDiff);
-                // console.log(counter, 'smallestDiff:', smallestDiff, 'bestMove:', bestMove, heights);
-
                 if (smallestDiff >= heights.avgDifference) {
                     bestMove = false;
                     return;
@@ -173,15 +170,14 @@ class ImageRender extends React.Component {
                 calcHeights([this._col0, this._col1, this._col2]);
             };
 
-            checkColumns = (delay) => new Promise(resolve => setTimeout(resolve, delay))
+            checkColumns = delay => new Promise(resolve => setTimeout(resolve, delay))
                 .then(() => {
 
                     const oldHeights = JSON.stringify(heights);
                     calcHeights(columns);
-                    console.log(JSON.stringify(heights), oldHeights);
                     return JSON.stringify(heights) === oldHeights;
                 })
-                .then((bool) => {
+                .then(bool => {
 
                     if (bool === false) {
                         
