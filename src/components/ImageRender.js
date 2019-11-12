@@ -1,4 +1,5 @@
 import React from 'react';
+import { timeout } from 'q';
 
 class ImageRender extends React.Component {
 
@@ -173,7 +174,8 @@ class ImageRender extends React.Component {
                 calcHeights([this._col0, this._col1, this._col2]);
             };
 
-            checkColumns = () => new Promise(resolve => {
+            checkColumns = (delay) => new Promise(resolve => timeout(resolve, delay)
+            .then(() => {
 
                 const oldHeights = JSON.stringify(heights);
                 calcHeights(columns);
@@ -201,7 +203,7 @@ class ImageRender extends React.Component {
             });
 
             calcHeights(columns);
-            checkColumns();
+            checkColumns(500);
 
 
         } else if (loadedImages < images.length) this.setState({ loadedImages: loadedImages + 1 });
