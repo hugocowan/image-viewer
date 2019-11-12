@@ -24,6 +24,12 @@ class App extends React.Component {
     }
 
     componentDidMount() {
+
+        if (this.state.apiURL === undefined) {
+            this.setState({ error: 'API URL not set in .env - see README.' });
+            return;
+        }
+
         fetch(`${this.state.apiURL}:5001/api/images`, {
             headers: {
                 'Accept': 'application/json',
@@ -35,19 +41,19 @@ class App extends React.Component {
     }
 
     handleSortChange = (sortType) => {
-    
+
         let images = [ ...this.state.images ];
 
         switch(sortType) {
             case 'shuffle' :
                 images = shuffle(images);
                 break;
-            
+
             case 'natural' :
                 images.sort(naturalSort);
                 break;
-            
-            case 'naturalReverse' : 
+
+            case 'naturalReverse' :
                 images.sort(naturalSort).reverse();
                 break;
 
@@ -65,7 +71,7 @@ class App extends React.Component {
         if (!this.state.enableDelete) {
 
             this.setState({ selectedImage: filename });
-            return;  
+            return;
         }
 
         const delImgs = [ ...this.state.imagesForDeletion ];
@@ -79,22 +85,22 @@ class App extends React.Component {
     onImageChange = images => this.setState({ images, updateNeeded: true });
 
     toggleDelete = () => this.state.enableDelete ?
-        this.setState({ enableDelete: !this.state.enableDelete, imagesForDeletion: [] }) 
+        this.setState({ enableDelete: !this.state.enableDelete, imagesForDeletion: [] })
         : this.setState({ enableDelete: !this.state.enableDelete });
 
     render() {
 
-        if (this.state.images === null) return ( 
+        if (this.state.images === null) return (
             <div className={`App ${!!this.state.error}`}>
                 {this.state.error || 'Loading...'}
             </div>
         );
-        
+
         return (
             <div className="App">
-                <Navbar 
+                <Navbar
                     apiURL={this.state.apiURL}
-                    handleSortChange={this.handleSortChange} 
+                    handleSortChange={this.handleSortChange}
                     sortType={this.state.sortType}
                     toggleDelete={this.toggleDelete}
                     enableDelete={this.state.enableDelete}
@@ -104,7 +110,7 @@ class App extends React.Component {
                     toggleMakeFixed={() => this.setState({ makeFixed: !this.state.makeFixed })}
                     onImageChange={images => this.onImageChange(images)}
                 />
-                {this.state.selectedImage && 
+                {this.state.selectedImage &&
                 <Modal
                     apiURL={this.state.apiURL}
                     images={this.state.images}
@@ -113,11 +119,10 @@ class App extends React.Component {
                     onImageChange={images => this.onImageChange(images)}
                     onClick ={() => this.setState({ selectedImage: '' })}
                 />}
-                <ImageRender 
+                <ImageRender
                     makeFixed={this.state.makeFixed}
                     apiURL={this.state.apiURL}
-                    images={this.state.images} 
-                    handleSort={this.handleSort} 
+                    images={this.state.images}
                     handleSelectedImage={src => this.handleSelectedImage(src)}
                     imagesForDeletion={this.state.imagesForDeletion}
                     updateNeeded={this.state.updateNeeded}

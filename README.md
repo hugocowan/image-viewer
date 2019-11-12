@@ -38,7 +38,7 @@ You can detach from the tmux session with `Ctrl-b d`, and re-attach to it with `
 
 If you're hosting your server outside of your local machine, you can specify its ip address in .env.
 
-* Make a .env file with your server's ip address specified: 
+* Make a .env file at the root level (/image-viewer) with your server's ip address specified: 
 
 * Type `touch .env`
 
