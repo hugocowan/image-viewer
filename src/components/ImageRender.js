@@ -1,5 +1,4 @@
 import React from 'react';
-import { timeout } from 'q';
 
 class ImageRender extends React.Component {
 
@@ -84,7 +83,7 @@ class ImageRender extends React.Component {
             };
 
             // Get height data for each of the columns
-            const calcHeights = _columns => {
+            const calcHeights = (_columns) => {
 
                 // Make array containing references to all image elements.
                 const columnChildren = [ this.col0.children, this.col1.children, this.col2.children ],
@@ -174,33 +173,33 @@ class ImageRender extends React.Component {
                 calcHeights([this._col0, this._col1, this._col2]);
             };
 
-            checkColumns = (delay) => new Promise(resolve => timeout(resolve, delay))
-            .then(() => {
+            checkColumns = (delay) => new Promise(resolve => setTimeout(resolve, delay))
+                .then(() => {
 
-                const oldHeights = JSON.stringify(heights);
-                calcHeights(columns);
-                console.log(JSON.stringify(heights) === oldHeights);
-                return JSON.stringify(heights) === oldHeights;
-            })
-            .then(bool => {
+                    const oldHeights = JSON.stringify(heights);
+                    calcHeights(columns);
+                    console.log(JSON.stringify(heights), oldHeights);
+                    return JSON.stringify(heights) === oldHeights;
+                })
+                .then((bool) => {
 
-                if (bool === false) {
-                    
-                    checkColumns(500);
-                    return;
-                }
+                    if (bool === false) {
+                        
+                        checkColumns(500);
+                        return;
+                    }
 
-                while (bestMove !== false && counter < 100) {
-                    counter++;
-                    makeBestMove();
-                }
+                    while (bestMove !== false && counter < 100) {
+                        counter++;
+                        makeBestMove();
+                    }
 
-                // Set state with the finalised column arrays.
-                this.setState({
-                    columns: [this._col0, this._col1, this._col2],
-                    loadedImages: loadedImages + 1, sorting: false, sorted: true
+                    // Set state with the finalised column arrays.
+                    this.setState({
+                        columns: [this._col0, this._col1, this._col2],
+                        loadedImages: loadedImages + 1, sorting: false, sorted: true
+                    });
                 });
-            });
 
             calcHeights(columns);
             checkColumns(500);
