@@ -174,7 +174,7 @@ class ImageRender extends React.Component {
                 calcHeights([this._col0, this._col1, this._col2]);
             };
 
-            checkColumns = (delay) => new Promise(resolve => timeout(resolve, delay)
+            checkColumns = (delay) => new Promise(resolve => timeout(resolve, delay))
             .then(() => {
 
                 const oldHeights = JSON.stringify(heights);
