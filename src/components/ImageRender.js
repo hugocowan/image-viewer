@@ -130,7 +130,7 @@ class ImageRender extends React.Component {
 
             // Calculate the best column(s) to take an image from.
             const makeBestMove = () => {
-                
+
                 let colA = heights.smallestCol,
                     [ colB, colC ] = heights.smallestCol === 'col0' ? ['col1', 'col2'] :
                         heights.smallestCol === 'col1' ? ['col0', 'col2'] :
@@ -149,9 +149,9 @@ class ImageRender extends React.Component {
 
                     smallestDiff = Math.min(colBChangeDiff, colCChangeDiff, bothChangeDiff);
 
-                    
+
                     bestMove = colBChangeDiff === smallestDiff ? colB : colCChangeDiff === smallestDiff ? colC : 'both';
-                    
+
                 // If the smallest new average difference between columns >= the current avg distance, we're done.
                 if (smallestDiff >= heights.avgDifference) {
                     bestMove = false;
@@ -207,39 +207,23 @@ class ImageRender extends React.Component {
 
         entries.forEach(entry => {
 
-            const fileName = entry.target.alt.replace('From ', '');
+            const filename = entry.target.alt.replace('From ', '');
+            let src = `${this.props.apiURL}:5001/media/`, bigScreen = entry.target.clientWidth > 230;
 
             if (entry.isIntersecting) {
 
-                if (entry.target.clientWidth > 230 && entry.target.src.includes('/thumbnails/')) {
-
-                    entry.target.src = `${this.props.apiURL}:5001/media/${fileName}`;
-
-                } else {
-
-
-                    if (entry.target.clientWidth <= 230) {
-
-                        entry.target.src = fileName.includes('.gif') ?
-                            `${this.props.apiURL}:5001/media/thumbnails/live-${fileName}` :
-                            `${this.props.apiURL}:5001/media/thumbnails/${fileName}`;
-
-                    } else {
-                        entry.target.src = `${this.props.apiURL}:5001/media/thumbnails/${fileName}`;
-                    }
-                }
+                src += bigScreen && entry.target.src.includes('/thumbnails/') ? `${filename}` :
+                    !bigScreen && filename.includes('.gif') ? `thumbnails/live-${filename}` :
+                    `thumbnails/${filename}`;
 
             } else {
 
-                if (entry.target.clientWidth > 230 && entry.target.src.match(/live-.*gif/) !== null) {
-
-                    entry.target.src = `${this.props.apiURL}:5001/media/thumbnails/live-${fileName}`;
-
-                } else {
-                    entry.target.src = `${this.props.apiURL}:5001/media/thumbnails/${fileName}`;
-                }
+                src += bigScreen && entry.target.src.match(/live-.*gif/) !== null ?
+                    `thumbnails/live-${filename}` : `thumbnails/${filename}`;
             }
-        })
+
+            entry.target.src = src;
+        });
     };
 
     render() {
