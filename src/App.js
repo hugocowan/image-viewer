@@ -85,8 +85,8 @@ class App extends React.Component {
     onImageChange = images => this.setState({ images, updateNeeded: true });
 
     toggleDelete = () => this.state.enableDelete ?
-        this.setState({ enableDelete: !this.state.enableDelete, imagesForDeletion: [] })
-        : this.setState({ enableDelete: !this.state.enableDelete });
+        this.setState({ enableDelete: !this.state.enableDelete, imagesForDeletion: [] }) : 
+        this.setState({ enableDelete: !this.state.enableDelete });
 
     render() {
 

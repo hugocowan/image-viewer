@@ -23,25 +23,27 @@ class Navbar extends React.Component {
         </div>
     };
 
-    uploadImage = ({ target: { files } }) => {
+    uploadImage = ({ target }) => {
 
         let imageForm = new FormData();
 
-        for (let i = 0; i < files.length; i++) imageForm.append('imageData', files[i]);
+        for (let i = 0; i < target.files.length; i++) imageForm.append('imageData', target.files[i]);
 
         fetch(`${this.props.apiURL}:5001/api/upload`, {
             method: 'POST',
             body: imageForm,
         })
             .then(res => res.json())
-            .then(() => {
+            .then(({ files = [] }) => {
                 setTimeout(() => {
                     const images = this.props.images;
-                    for (let i = 0; i < files.length; i++) images.push(files[i].name);
+                    files.forEach(file => images.push(file.originalname)); 
                     this.props.onImageChange(images);
-                }, 200 * files.length);
+                    target.value = '';
+                }, 200 * target.files.length);
             })
             .catch(err => console.log('error:', err));
+
     };
 
     handleDelete = () => {
@@ -104,7 +106,7 @@ class Navbar extends React.Component {
                             className={`${sortType === 'shuffle'}`}
                             onClick={() => handleSortChange('shuffle')}
                             >
-                            Shuffle
+                                Shuffle
                             </li>
                             <li
                                 className={`${sortType === 'natural'}`}

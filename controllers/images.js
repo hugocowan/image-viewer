@@ -20,7 +20,24 @@ const storage = multer.diskStorage({
         cb(null, './src/assets/');
     },
     filename: function(req, file, cb) {
-        cb(null, path.basename(file.originalname));
+
+        const files = fs.readdirSync('./src/assets').reduce((files, file) => {
+            if (/\.(png|jpe?g|gif)$/.test(file)) files.push(file);
+            return files;
+        }, []);
+
+        let counter = 0, 
+            filename = path.basename(file.originalname),
+            type = filename.slice(filename.lastIndexOf('.'));
+
+        while(files.includes(filename)) {
+            filename = counter === 0 ?  filename.substr(0, filename.lastIndexOf('.')) + `${counter++}${type}` :
+                filename.substr(0, filename.lastIndexOf('.') - 1) + `${counter++}${type}`;
+        }
+
+        file.originalname = file.originalname.substr(0, file.originalname.lastIndexOf('/') + 1) + filename;
+
+        cb(null, filename);
     }
 });
 
@@ -32,7 +49,7 @@ function uploadRoute(req, res, next) {
 
         req.files.forEach(file => {
 
-            const filename = path.basename(file.originalname);
+            let filename = path.basename(file.originalname);
 
             if (file.mimetype.includes('gif')) {
 
@@ -60,7 +77,7 @@ function uploadRoute(req, res, next) {
             return;
         }
 
-        res.json({ message: 'Success!' });
+        res.json({ message: 'Success!', files: req.files });
     });
 }
 
