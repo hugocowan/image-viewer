@@ -37,7 +37,7 @@ class App extends React.Component {
         })
             .then(res => res.json())
             .then(data => this.setState({ images: shuffle(data.files) }))
-            .catch(err => this.setState({error: err.message}));
+            .catch(err => this.setState({ error: err.message }));
     }
 
     handleSortChange = sortType => {
@@ -96,7 +96,7 @@ class App extends React.Component {
             </div>
         );
 
-        return <div className="App">
+        return <div className={`App ${!!this.state.enableDelete}`}>
             <Navbar
                 apiURL={this.state.apiURL}
                 handleSortChange={this.handleSortChange}

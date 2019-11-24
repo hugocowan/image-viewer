@@ -6,6 +6,17 @@
 
     &.true {
         color: red;
+
+        nav {
+            position: fixed;
+            background: #282c34;
+            width: 100%;
+            z-index: 1;
+        }
+
+        .main {
+            margin-top: 47px;
+        }
     }
 
     nav {
