@@ -1,5 +1,4 @@
 import React from 'react';
-import '../App.scss';
 import Modal from '../components/Modal';
 import Navbar from '../components/Navbar';
 import ImageRender from '../components/ImageRender';
@@ -19,7 +18,8 @@ class Index extends React.Component {
             selectedImage: '',
             enableDelete: false,
             imagesForDeletion: [],
-            apiURL: process.env.REACT_APP_API_URL
+            apiURL: process.env.REACT_APP_API_URL,
+            apiPORT: process.env.REACT_APP_API_PORT,
         };
     }
 
@@ -99,6 +99,7 @@ class Index extends React.Component {
         return <div className={`App ${!!this.state.enableDelete}`}>
             <Navbar
                 apiURL={this.state.apiURL}
+                apiPORT={this.state.apiPORT}
                 handleSortChange={this.handleSortChange}
                 sortType={this.state.sortType}
                 toggleDelete={this.toggleDelete}
@@ -112,6 +113,7 @@ class Index extends React.Component {
             {this.state.selectedImage &&
             <Modal
                 apiURL={this.state.apiURL}
+                apiPORT={this.state.apiPORT}
                 images={this.state.images}
                 imageLink={this.state.selectedImage}
                 enableDelete={this.state.enableDelete}
@@ -121,6 +123,7 @@ class Index extends React.Component {
             <ImageRender
                 makeFixed={this.state.makeFixed}
                 apiURL={this.state.apiURL}
+                apiPORT={this.state.apiPORT}
                 images={this.state.images}
                 handleSelectedImage={src => this.handleSelectedImage(src)}
                 imagesForDeletion={this.state.imagesForDeletion}

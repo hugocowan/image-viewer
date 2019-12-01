@@ -1,8 +1,17 @@
+require('dotenv').config();
 const router = require('./config/router.js');
-const port = process.env.PORT || 5001;
+const port = process.env.REACT_APP_API_PORT || 5001;
+const session = require('express-session');
 const express = require('express');
 const app = express();
 
+app.use(session({
+	secret: process.env.SECRET,
+	resave: true,
+	saveUninitialized: true
+}));
+
+// app.use(express.urlencoded({extended : true}));
 app.use(express.json());
 
 app.use(function(req, res, next) {

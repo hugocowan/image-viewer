@@ -208,7 +208,7 @@ class ImageRender extends React.Component {
         entries.forEach(entry => {
 
             const filename = entry.target.alt.replace('From ', '');
-            let src = `${this.props.apiURL}:5001/media/`, bigScreen = entry.target.clientWidth > 230;
+            let src = `${this.props.apiURL}:${this.props.apiPORT}/media/`, bigScreen = entry.target.clientWidth > 230;
 
             if (entry.isIntersecting) {
 
@@ -243,7 +243,7 @@ class ImageRender extends React.Component {
                                     onLoad={this.onImgLoad}
                                     title={imageLink}
                                     alt={`From ${imageLink}`}
-                                    src={`${this.props.apiURL}:5001/media/thumbnails/${imageLink}`}
+                                    src={`${this.props.apiURL}:${this.props.apiPORT}/media/thumbnails/${imageLink}`}
                                     onClick ={() => this.props.handleSelectedImage(imageLink)}
                                 />
                             </div>
