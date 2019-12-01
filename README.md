@@ -36,12 +36,10 @@ You can detach from the tmux session with `Ctrl-b d`, and re-attach to it with `
 
 ### Set your server's ip address
 
-If you're hosting your server outside of your local machine, you can specify its ip address in .env.
+If you're hosting your server outside of your local machine, you can specify its IP address in .env to allow other devices on the local network access.
 
-* Make a .env file at the root level (/image-viewer) with your server's ip address specified: 
+* With your preferred text editor, open `.env` located in the root folder of image-viewer. Replace `localhost` with the IP address your server is hosted on (e.g. your host's IP address 192.168.X.XX) and hit save.
 
-* Type `touch .env`
+![An example of an edited .env file](./public/api-url.png)
 
-* Type `echo "REACT_APP_API_URL=http://192.168.1.1" > .env` where `192.168.1.1` is your server ip address. If it's your local machine, you can use `http://localhost` instead of an ip address.
-
-* Restart your client and server.
+* Restart your client and server. Try connecting with a different device by typing `[Your IP Address]:3000`, e.g. `192.168.1.10:3000`.
