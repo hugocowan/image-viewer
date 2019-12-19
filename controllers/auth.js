@@ -20,6 +20,7 @@ function loginRoute(req, res) {
             function(error, results, fields) {
 
                 if (error) {
+                    console.log('error:', error, process.env.REACT_APP_API_URL);
                     res.json({ loggedIn: false, error });
                     return;
                 }
