@@ -10,7 +10,7 @@ class Login extends React.Component {
 
     handleChange = ({ target: { name, value }  }) => {
         this.setState({ [name]: value });
-    }
+    };
 
     handleSubmit = e => {
         e.preventDefault();
@@ -28,28 +28,28 @@ class Login extends React.Component {
             this.props.handleLogin(res.data);
         })
         .catch(err => console.log('Error while logging in:', err));
-    }
+    };
 
     render () {
-    
+
         return <div className="login-form">
 			<h1>Login Form</h1>
             <p>{this.state.loggedIn || this.state.error}</p>
 
 			<form onSubmit={this.handleSubmit}>
-                <input 
-                    type="text" 
-                    name="username" 
-                    placeholder="Username" 
-                    onChange={this.handleChange} 
-                    required 
+                <input
+                    type="text"
+                    name="username"
+                    placeholder="Username"
+                    onChange={this.handleChange}
+                    required
                 />
-                <input 
-                    type="password" 
-                    name="password" 
+                <input
+                    type="password"
+                    name="password"
                     placeholder="Password"
-                    onChange={this.handleChange} 
-                    required 
+                    onChange={this.handleChange}
+                    required
                 />
 				<input type="submit" />
 			</form>
