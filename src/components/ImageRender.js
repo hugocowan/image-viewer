@@ -87,7 +87,8 @@ class ImageRender extends React.Component {
 
                 // Make array containing references to all image elements.
                 const columnChildren = [ this.col0.children, this.col1.children, this.col2.children ],
-                    marginBottom = parseInt(window.getComputedStyle(columnChildren[0][0]).marginBottom),
+                    child = columnChildren[0][0] || columnChildren[1][0] || columnChildren[2][0] || null,
+                    marginBottom = null !== child ? parseInt(window.getComputedStyle(child).marginBottom) : 0,
                     heightMap = {};
 
                 // Get individual image sizes + margin from each column's HTMLCollection of images.
