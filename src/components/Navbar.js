@@ -74,6 +74,12 @@ class Navbar extends React.Component {
             makeFixed, toggleMakeFixed
         } = this.props;
 
+        const columnSizes = [];
+
+        for (let i = 1; i <= 100; i++) {
+            columnSizes.push(i);
+        }
+
         return (
             <nav className={`${makeFixed || enableDelete}`}>
                 <this.renderBurger />
@@ -93,9 +99,12 @@ class Navbar extends React.Component {
                                 Files
                             </li>
                             <li
-                                onClick={() => this.setState({ context: 'columns' })}
+                                
                             >
-                                Columns
+                                <label htmlFor='column-sizes'>Columns</label>
+                                <select id='column-sizes' value={columns.length} onChange={handleColumnChange}>
+                                    {columnSizes.map(size => <option key={size} value={size}>{size}</option>)}
+                                </select>
                             </li>
                             <li
                                 className={`${makeFixed}`}
@@ -157,46 +166,6 @@ class Navbar extends React.Component {
                             </li>
                         </div>}
 
-                        {this.state.context === 'columns' &&
-                        <div>
-                            <li
-                            className={`${columns.length === 1}`}
-                            onClick={() => handleColumnChange([ [] ])}
-                            >
-                                1
-                            </li>
-                            <li
-                                className={`${columns.length === 2}`}
-                                onClick={() => handleColumnChange([ [], [] ])}
-                            >
-                                2
-                            </li>
-                            <li
-                                className={`${columns.length === 3}`}
-                                onClick={() => handleColumnChange([ [], [], [] ])}
-                            >
-                                3
-                            </li>
-                            <li
-                                className={`${columns.length === 4}`}
-                                onClick={() => handleColumnChange([ [], [], [], [] ])}
-                            >
-                                4
-                            </li>
-                            <li
-                                className={`${columns.length === 5}`}
-                                onClick={() => handleColumnChange([ [], [], [], [], [] ])}
-                            >
-                                5
-                            </li>
-                            <li
-                                className={`${columns.length === 6}`}
-                                onClick={() => handleColumnChange([ [], [], [], [], [], [] ])}
-                            >
-                                6
-                            </li>
-                        </div>
-                        }
                     </ul>}
             </nav>
         );

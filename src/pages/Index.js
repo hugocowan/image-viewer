@@ -65,7 +65,12 @@ class Index extends React.Component {
 
     };
 
-    handleColumnChange = columns => this.setState({ columns, updateNeeded: true });
+    handleColumnChange = ({ target: { value } }) => {
+        const columns = [];
+        for (let i = 0; i < value; i++) columns.push([]);
+
+        this.setState({ columns, updateNeeded: true });
+    };
 
     handleSelectedImage = src => {
 
