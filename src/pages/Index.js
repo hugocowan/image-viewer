@@ -1,9 +1,9 @@
-import React from 'react';
-import '../App.scss';
-import Modal from '../components/Modal';
-import Navbar from '../components/Navbar';
-import ImageRender from '../components/ImageRender';
+import React, { Suspense } from 'react';
 import { shuffle, naturalSort } from '../lib/Sort';
+import '../App.scss';
+const Modal = React.lazy(() => import('../components/Modal'));
+const Navbar = React.lazy(() => import('../components/Navbar'));
+const ImageRender = React.lazy(() => import('../components/ImageRender'));
 
 class Index extends React.Component {
 
@@ -14,6 +14,7 @@ class Index extends React.Component {
             images: null,
             makeFixed: false,
             sortType: 'shuffle',
+            columns: [ [], [], [] ],
             updateNeeded: false,
             error: false,
             selectedImage: '',
@@ -64,6 +65,8 @@ class Index extends React.Component {
 
     };
 
+    handleColumnChange = columns => this.setState({ columns, updateNeeded: true });
+
     handleSelectedImage = src => {
 
         let filename = src;
@@ -97,36 +100,41 @@ class Index extends React.Component {
         );
 
         return <div className={`App ${!!this.state.enableDelete}`}>
-            <Navbar
-                apiURL={this.state.apiURL}
-                handleSortChange={this.handleSortChange}
-                sortType={this.state.sortType}
-                toggleDelete={this.toggleDelete}
-                enableDelete={this.state.enableDelete}
-                imagesForDeletion={this.state.imagesForDeletion}
-                images={this.state.images}
-                makeFixed={this.state.makeFixed}
-                toggleMakeFixed={() => this.setState({ makeFixed: !this.state.makeFixed })}
-                onImageChange={images => this.onImageChange(images)}
-            />
-            {this.state.selectedImage &&
-            <Modal
-                apiURL={this.state.apiURL}
-                images={this.state.images}
-                imageLink={this.state.selectedImage}
-                enableDelete={this.state.enableDelete}
-                onImageChange={images => this.onImageChange(images)}
-                onClick ={() => this.setState({ selectedImage: '' })}
-            />}
-            <ImageRender
-                makeFixed={this.state.makeFixed}
-                apiURL={this.state.apiURL}
-                images={this.state.images}
-                handleSelectedImage={src => this.handleSelectedImage(src)}
-                imagesForDeletion={this.state.imagesForDeletion}
-                updateNeeded={this.state.updateNeeded}
-                updateDone={() => this.setState({ updateNeeded: false })}
-            />
+            <Suspense>
+                <Navbar
+                    apiURL={this.state.apiURL}
+                    handleSortChange={this.handleSortChange}
+                    handleColumnChange={this.handleColumnChange}
+                    sortType={this.state.sortType}
+                    toggleDelete={this.toggleDelete}
+                    enableDelete={this.state.enableDelete}
+                    imagesForDeletion={this.state.imagesForDeletion}
+                    images={this.state.images}
+                    columns={this.state.columns}
+                    makeFixed={this.state.makeFixed}
+                    toggleMakeFixed={() => this.setState({ makeFixed: !this.state.makeFixed })}
+                    onImageChange={images => this.onImageChange(images)}
+                />
+                {this.state.selectedImage &&
+                <Modal
+                    apiURL={this.state.apiURL}
+                    images={this.state.images}
+                    imageLink={this.state.selectedImage}
+                    enableDelete={this.state.enableDelete}
+                    onImageChange={images => this.onImageChange(images)}
+                    onClick ={() => this.setState({ selectedImage: '' })}
+                />}
+                <ImageRender
+                    makeFixed={this.state.makeFixed}
+                    apiURL={this.state.apiURL}
+                    images={this.state.images}
+                    columns={this.state.columns}
+                    handleSelectedImage={src => this.handleSelectedImage(src)}
+                    imagesForDeletion={this.state.imagesForDeletion}
+                    updateNeeded={this.state.updateNeeded}
+                    updateDone={() => this.setState({ updateNeeded: false })}
+                />
+            </Suspense>
         </div>;
     }
 }

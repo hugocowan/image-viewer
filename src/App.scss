@@ -1,5 +1,4 @@
 .App {
-    background-color: #282c34;
     min-height: 100vh;
     overflow-x: hidden;
     user-select: none;
@@ -191,10 +190,8 @@
                 align-items: center;
                 justify-content: space-between;
                 height: 100%;
+                margin: 0 5px;
                 
-                &:nth-child(even) {
-                    margin: 0 10px;
-                }
                 
                 .image {
                     width: 100%;
@@ -256,34 +253,6 @@
             min-height: 40%;
             object-fit: contain;
             align-self: center;
-        }
-    }
-
-  
-    // Accounts for scroll wheel on desktop.
-    @media (min-width: 768px) {
-        .main {
-            .img-container {
-                padding: 0 17px 17px;
-                
-                img {
-                    width: 100%;
-                    margin: 10px 0;
-        
-                    &:first-child {
-                        margin: 0 0 10px;
-                    }
-                }
-    
-                .img-wrapper {
-                    width: calc(33% - 12px);
-    
-                    &:nth-child(even) {
-                        margin: 0 20px;
-                    }
-                }
-            }
-
         }
     }
 }

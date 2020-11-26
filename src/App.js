@@ -1,9 +1,11 @@
-import React from 'react';
-import Index from './pages/Index';
+import React, { Suspense } from 'react';
+const Index = React.lazy(() => import('./pages/Index'));
 
 class App extends React.Component {
     render() {
-        return <Index />;
+        return <Suspense fallback={<div className='App'>Loading...</div>}>
+            <Index />;
+        </Suspense>
     }
 }
 

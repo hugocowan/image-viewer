@@ -24,7 +24,7 @@ A giphy-style image viewer. Add your images and keep your own local image file s
 
 * Navigate to the project's root folder.
 
-* Type `yarn build`, hit enter. Wait for the build to finish.
+* Type `npm run build`, hit enter. Wait for the build to finish.
 
 * Type `tmux`, hit enter.
 
