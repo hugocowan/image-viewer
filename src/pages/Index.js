@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react';
 import { shuffle, naturalSort } from '../lib/Sort';
-import '../App.scss';
+import '../style/App.scss';
 const Modal = React.lazy(() => import('../components/Modal'));
 const Navbar = React.lazy(() => import('../components/Navbar'));
 const ImageRender = React.lazy(() => import('../components/ImageRender'));

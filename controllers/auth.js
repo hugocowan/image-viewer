@@ -1,10 +1,15 @@
 const mysql = require('mysql');
 
 const connection = mysql.createConnection({
-	host     : process.env.REACT_APP_API_URL,
-	user     : 'root',
+	host     : process.env.API_URL,
+	user     : process.env.USER,
 	password : process.env.MYSQLPASSWORD,
-	database : 'nodelogin'
+	database : 'image_viewer'
+});
+
+connection.connect((err) => {
+    if (err) throw err;
+    console.log('Connected to MySQL Server!');
 });
 
 function loginRoute(req, res) {
@@ -12,7 +17,6 @@ function loginRoute(req, res) {
     
     const username = req.body.username,
         password = req.body.password;
-    console.log(username, password);
     
 	if (username && password) {
 		connection.query(
@@ -27,9 +31,9 @@ function loginRoute(req, res) {
 
                 if (results.length > 0) {
 
-                    req.session.loggedin = true;
+                    req.session.loggedIn = true;
                     req.session.username = username;
-                    res.json({ loggedIn: true, error: false });
+                    res.json({ username, loggedIn: true, error: false });
 
                 } else {
 

@@ -23,9 +23,10 @@ class Login extends React.Component {
             },
             body: JSON.stringify({ username: this.state.username, password: this.state.password }),
         })
-        .then(res => {
-            this.setState({ loggedIn: res.data.loggedIn, error: res.data.error });
-            this.props.handleLogin(res.data);
+        .then((res) => res.json())
+        .then(data => {
+            this.setState({ loggedIn: data.loggedIn, error: data.error });
+            this.props.handleLogin(data);
         })
         .catch(err => console.log('Error while logging in:', err));
     };
