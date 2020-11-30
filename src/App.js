@@ -1,5 +1,5 @@
-import React from 'react';
-import Index from './pages/Index';
+import React, { Suspense } from 'react';
+const Index = React.lazy(() => import('./pages/Index'));
 import Login from './pages/Login';
 import './style/App.scss';
 import './style/Login.scss';
@@ -21,7 +21,9 @@ class App extends React.Component {
             return <Login handleLogin={this.handleLogin} />;
         }
  
-        return <Index />;
+        return <Suspense fallback={<div className='App'>Loading...</div>}>
+            <Index />;
+        </Suspense>
     }
 }
 

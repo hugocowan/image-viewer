@@ -1,5 +1,4 @@
 .App {
-    background-color: #282c34;
     min-height: 100vh;
     overflow-x: hidden;
     user-select: none;
@@ -129,6 +128,9 @@
             }
 
             li {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
                 text-align: center;
                 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
                 list-style-type: none;
@@ -152,6 +154,18 @@
                     border: 2px #4D555F solid;
                     padding: 3px;
                     border-radius: 10px;
+                }
+
+                select {
+                    width: 41%;
+                    padding: 7px 4px;
+                    margin: 0 0 0 10px;
+                    font-size: inherit;
+                    color: inherit;
+                    border: none;
+                    border-radius: 4px;
+                    background-color: darken(#282c34, 10%);
+                    cursor: pointer;
                 }
             }
         }
@@ -191,10 +205,8 @@
                 align-items: center;
                 justify-content: space-between;
                 height: 100%;
+                margin: 0 5px;
                 
-                &:nth-child(even) {
-                    margin: 0 10px;
-                }
                 
                 .image {
                     width: 100%;
@@ -256,34 +268,6 @@
             min-height: 40%;
             object-fit: contain;
             align-self: center;
-        }
-    }
-
-  
-    // Accounts for scroll wheel on desktop.
-    @media (min-width: 768px) {
-        .main {
-            .img-container {
-                padding: 0 17px 17px;
-                
-                img {
-                    width: 100%;
-                    margin: 10px 0;
-        
-                    &:first-child {
-                        margin: 0 0 10px;
-                    }
-                }
-    
-                .img-wrapper {
-                    width: calc(33% - 12px);
-    
-                    &:nth-child(even) {
-                        margin: 0 20px;
-                    }
-                }
-            }
-
         }
     }
 }

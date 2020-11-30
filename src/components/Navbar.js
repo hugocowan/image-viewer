@@ -68,11 +68,17 @@ class Navbar extends React.Component {
     render() {
 
         const {
-            handleSortChange, sortType,
+            handleSortChange, handleColumnChange, sortType,
             enableDelete, toggleDelete,
-            imagesForDeletion,
+            imagesForDeletion, columns,
             makeFixed, toggleMakeFixed
         } = this.props;
+
+        const columnSizes = [];
+
+        for (let i = 1; i <= 100; i++) {
+            columnSizes.push(i);
+        }
 
         return (
             <nav className={`${makeFixed || enableDelete}`}>
@@ -91,6 +97,14 @@ class Navbar extends React.Component {
                                 onClick={() => this.setState({ context: 'files' })}
                             >
                                 Files
+                            </li>
+                            <li
+                                
+                            >
+                                <label htmlFor='column-sizes'>Columns</label>
+                                <select id='column-sizes' value={columns.length} onChange={handleColumnChange}>
+                                    {columnSizes.map(size => <option key={size} value={size}>{size}</option>)}
+                                </select>
                             </li>
                             <li
                                 className={`${makeFixed}`}
@@ -151,6 +165,7 @@ class Navbar extends React.Component {
                                 {enableDelete && 'Disable Deleting'}
                             </li>
                         </div>}
+
                     </ul>}
             </nav>
         );
