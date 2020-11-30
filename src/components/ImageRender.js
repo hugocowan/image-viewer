@@ -176,18 +176,18 @@ class ImageRender extends React.Component {
     handleIntersection = entries => entries.forEach(entry => {
         
         const filename = entry.target.alt.replace('From ', '');
-        let src = `${this.props.apiURL}:${this.props.apiPORT}/media/`, bigScreen = entry.target.clientWidth > 230;
+        let src = `${this.props.apiURL}:${this.props.apiPORT}/media/`, bigImage = entry.target.clientWidth > 230;
 
         if (entry.isIntersecting) {
 
             const filename = entry.target.alt.replace('From ', '');
-            src += bigScreen && entry.target.src.includes('/thumbnails/') ? `${filename}` :
-                !bigScreen && filename.includes('.gif') ? `thumbnails/live-${filename}` :
+            src += bigImage && entry.target.src.includes('/thumbnails/') ? `${filename}` :
+                !bigImage && filename.includes('.gif') ? `thumbnails/live-${filename}` :
                 `thumbnails/${filename}`;
 
         } else {
 
-            src += bigScreen && entry.target.src.match(/live-.*gif/) !== null ?
+            src += bigImage && entry.target.src.match(/live-.*gif/) !== null ?
                 `thumbnails/live-${filename}` : `thumbnails/${filename}`;
         }
 

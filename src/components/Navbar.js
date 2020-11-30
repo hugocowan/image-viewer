@@ -2,20 +2,14 @@ import React from 'react';
 
 class Navbar extends React.Component {
 
-    constructor (props) {
-        super(props);
-
-        this.state = {
-            showNav: false,
-            context: null
-        };
-    }
+    // constructor (props) {
+    //     super(props);
+    // }
 
     renderBurger = () => {
         return <div
-            className={`burger ${this.state.showNav} context-${!!this.state.context}`}
-            onClick={() => this.state.context ? this.setState({ context: null }) :
-                this.setState({ showNav: !this.state.showNav })}
+                className={`burger ${this.props.showNav} context-${!!this.props.navContext}`}
+                onClick={() => this.props.toggleShowNav()}
             >
             <div />
             <div />
@@ -68,7 +62,8 @@ class Navbar extends React.Component {
     render() {
 
         const {
-            handleSortChange, handleColumnChange, sortType,
+            handleSortChange, handleColumnChange, handleNavContextChange,
+            sortType,
             enableDelete, toggleDelete,
             imagesForDeletion, columns,
             makeFixed, toggleMakeFixed
@@ -83,18 +78,18 @@ class Navbar extends React.Component {
         return (
             <nav className={`${makeFixed || enableDelete}`}>
                 <this.renderBurger />
-                {this.state.showNav &&
+                {this.props.showNav &&
                     <ul>
 
-                        {this.state.context === null &&
+                        {this.props.navContext === null &&
                         <div>
                             <li
-                                onClick={() => this.setState({ context: 'sorting' })}
+                                onClick={() => handleNavContextChange('sorting')}
                             >
                                 Sorting
                             </li>
                             <li
-                                onClick={() => this.setState({ context: 'files' })}
+                                onClick={() => handleNavContextChange('files')}
                             >
                                 Files
                             </li>
@@ -114,7 +109,7 @@ class Navbar extends React.Component {
                             </li>
                         </div>}
 
-                        {this.state.context === 'sorting' &&
+                        {this.props.navContext === 'sorting' &&
                         <div>
                             <li
                             className={`${sortType === 'shuffle'}`}
@@ -137,7 +132,7 @@ class Navbar extends React.Component {
                         </div>
                         }
 
-                        {this.state.context === 'files' &&
+                        {this.props.navContext === 'files' &&
                         <div>
                             <li>
                                 <label htmlFor="file-upload" className="custom-file-upload">Upload</label>

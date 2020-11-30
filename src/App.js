@@ -13,7 +13,6 @@ class App extends React.Component {
 
     componentDidMount() {
         const username = document.cookie.split(';').reduce((hasLoginCookie, cookie) => cookie.includes('loggedIn') ? cookie.split('=').pop() : hasLoginCookie, false);
-
         if (!this.state.loggedIn && username) this.setState({ username, loggedIn: true });
     }
 
@@ -35,7 +34,9 @@ class App extends React.Component {
         }
  
         return <Suspense fallback={<div className='App'>Loading...</div>}>
-            <Index />;
+            <Index 
+                username={this.state.username}
+            />;
         </Suspense>
     }
 }

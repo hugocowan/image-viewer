@@ -13,7 +13,10 @@ class Index extends React.Component {
         this.state = {
             images: null,
             makeFixed: false,
+            username: this.props.username,
             sortType: 'shuffle',
+            showNav: false,
+            navContext: null,
             columns: [ [], [], [] ],
             updateNeeded: false,
             error: false,
@@ -32,13 +35,29 @@ class Index extends React.Component {
             return;
         }
 
-        fetch(`${this.state.apiURL}:5001/api/images`, {
+        fetch(`${this.state.apiURL}:${this.state.apiPORT}/api/settings/get`, {
+            method: 'POST',
             headers: {
                 'Accept': 'application/json',
+                'Content-Type': 'application/json',
             },
+            body: JSON.stringify({ username: this.state.username }),
         })
             .then(res => res.json())
-            .then(data => this.setState({ images: shuffle(data.files) }))
+            .then(({ showNav, navContext, sortType, columnNumber, fixNavbar }) => {
+                const columns = [];
+                for (let i = 0; i < columnNumber; i++) columns.push([]);
+                this.setState({ showNav, navContext, sortType, columns, makeFixed: fixNavbar });
+
+                fetch(`${this.state.apiURL}:${this.state.apiPORT}/api/images`, {
+                    headers: {
+                        'Accept': 'application/json',
+                    },
+                })
+                    .then(res => res.json())
+                    .then(data => this.setState({ images: shuffle(data.files) }))
+                    .catch(err => this.setState({ error: err.message }));
+            })
             .catch(err => this.setState({ error: err.message }));
     }
 
@@ -62,7 +81,7 @@ class Index extends React.Component {
             default: break;
         }
 
-        this.setState({ sortType, images, updateNeeded: true });
+        this.setState({ sortType, images, updateNeeded: (images.length > 0) ? true : false }, () => this.onSettingsChange());
 
     };
 
@@ -70,8 +89,20 @@ class Index extends React.Component {
         const columns = [];
         for (let i = 0; i < value; i++) columns.push([]);
 
-        this.setState({ columns, updateNeeded: true });
+        this.setState({ columns, updateNeeded: this.state.images.length > 0 ? true : false }, () => this.onSettingsChange());
     };
+
+    onSettingsChange = () => {
+        fetch(`${this.state.apiURL}:${this.state.apiPORT}/api/settings/set`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ showSettings: this.state.showNav, context: this.state.navContext, sorting: this.state.sortType, columns: this.state.columns.length, fixNavbar: this.state.makeFixed, accountName: this.state.username }),
+        })
+            .catch(err => this.setState({ error: err.message }));
+    }
 
     handleSelectedImage = src => {
 
@@ -119,7 +150,11 @@ class Index extends React.Component {
                     images={this.state.images}
                     columns={this.state.columns}
                     makeFixed={this.state.makeFixed}
-                    toggleMakeFixed={() => this.setState({ makeFixed: !this.state.makeFixed })}
+                    showNav={this.state.showNav}
+                    navContext={this.state.navContext}
+                    toggleMakeFixed={() => this.setState({ makeFixed: !this.state.makeFixed }, () => this.onSettingsChange())}
+                    toggleShowNav={() => this.setState({ showNav: this.state.navContext ? true : !this.state.showNav, navContext: (!this.state.showNav) ? this.state.navContext : null }, () => this.onSettingsChange())}
+                    handleNavContextChange={navContext => this.setState({ navContext }, () => this.onSettingsChange())}
                     onImageChange={images => this.onImageChange(images)}
                 />
                 {this.state.selectedImage &&

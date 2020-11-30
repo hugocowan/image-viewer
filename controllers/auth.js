@@ -20,11 +20,11 @@ function loginRoute(req, res) {
     
 	if (username && password) {
 		connection.query(
-            'SELECT * FROM accounts WHERE username = ? AND password = ?', [username, password], 
+            'SELECT * FROM accounts WHERE username = ? AND password = ?', [ username, password ], 
             function(error, results, fields) {
 
                 if (error) {
-                    console.log('error:', error, process.env.REACT_APP_API_URL);
+                    console.log('Error while logging in:', error);
                     res.json({ loggedIn: false, error });
                     return;
                 }
@@ -33,7 +33,7 @@ function loginRoute(req, res) {
 
                     req.session.loggedIn = true;
                     req.session.username = username;
-                    res.json({ username, loggedIn: true, error: false });
+                    res.json({ username, id: results[0].id, loggedIn: true, error: false });
 
                 } else {
 
