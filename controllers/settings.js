@@ -1,22 +1,11 @@
-const mysql = require('mysql');
-
-const connection = mysql.createConnection({
-	host     : process.env.API_URL,
-	user     : process.env.USER,
-	password : process.env.MYSQLPASSWORD,
-	database : 'image_viewer'
-});
-
-connection.connect((err) => {
-    if (err) throw err;
-});
+const db = require('../models/dbconnection');
 
 
 function getRoute(req, res) {
 
     const accountName = req.body.username;
 
-    connection.query(
+    db.query(
         'SELECT * FROM account_settings INNER JOIN accounts ON account_settings.account_id = accounts.id WHERE accounts.username = ?', [ accountName ],
         function(error, results, fields) {
             
@@ -43,7 +32,7 @@ function setRoute(req, res) {
     console.log(showSettings, context, sorting, columns, fixNavbar, accountName);
 
 
-    connection.query(
+    db.query(
         'UPDATE account_settings INNER JOIN accounts ON account_settings.account_id = accounts.id SET show_settings = ?, context = ?, sorting = ?, `columns` = ?, fix_navbar = ? WHERE accounts.username = ?;', [ (showSettings === true) ? 1 : 0, context, sorting, columns, (fixNavbar === true) ? 1 : 0, accountName ],
         function(error, results, fields) {
             if (error) {

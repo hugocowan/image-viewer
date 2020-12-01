@@ -1,16 +1,4 @@
-const mysql = require('mysql');
-
-const connection = mysql.createConnection({
-	host     : process.env.API_URL,
-	user     : process.env.USER,
-	password : process.env.MYSQLPASSWORD,
-	database : 'image_viewer'
-});
-
-connection.connect((err) => {
-    if (err) throw err;
-    console.log('Connected to MySQL Server!');
-});
+const db = require('../models/dbconnection');
 
 function loginRoute(req, res) {
 
@@ -19,7 +7,7 @@ function loginRoute(req, res) {
         password = req.body.password;
     
 	if (username && password) {
-		connection.query(
+		db.query(
             'SELECT * FROM accounts WHERE username = ? AND password = ?', [ username, password ], 
             function(error, results, fields) {
 
