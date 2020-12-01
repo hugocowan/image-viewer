@@ -104,6 +104,11 @@ class Navbar extends React.Component {
                             >
                                 Fix Navbar
                             </li>
+                            <li
+                                onClick={() => handleNavContextChange('account')}
+                            >
+                                Account
+                            </li>
                         </div>}
 
                         {this.props.context === 'sorting' &&
@@ -183,6 +188,17 @@ class Navbar extends React.Component {
                                     value={sideMargin}
                                     onChange={this.props.handleSideMarginChange}
                                 />
+                            </li>
+                            
+                        </div>}
+
+                        {this.props.context === 'account' &&
+                        <div>
+                            <li>
+                                {this.props.username}
+                            </li>
+                            <li onClick={() => this.props.handleLogOut()}>
+                                Log Out
                             </li>
                             
                         </div>}

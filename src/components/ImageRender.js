@@ -45,7 +45,7 @@ class ImageRender extends React.Component {
     */
     onImgLoad = ({ target }, override = false) => {
 
-        let { loadedImages, currentlySorting, sorted, columns } = this.state, { images } = this.props;
+        let { loadedImages, currentlySorting, sorted, columns } = this.state, { images, sideMargin } = this.props;
 
         // Add images to the observer as their onload functions fire.
         if (target) this.observer.observe(target);
@@ -74,32 +74,21 @@ class ImageRender extends React.Component {
       
             // Get height data for each of the columns
             const calcHeights = _columns => {
-
-                // Make array containing references to all image elements.
-                const columnChildren = allColumns.map(col => this[`${col}`].children),
-                    child = columnChildren.reduce((child, childrenArray) => (null === child && childrenArray[0]) ? childrenArray[0] : child, null),
-                    marginBottom = null !== child ? parseInt(window.getComputedStyle(child).marginBottom) : 0,
-                    heightMap = {};
-
+                const heightMap = {};
+                
                 // Get individual image sizes + margin from each column's HTMLCollection of images.
-                columnChildren.forEach(column => {
-                    for (let i = 0; i < column.length; i++) {
-                        heightMap[column[i].firstChild.title] = column[i].clientHeight + marginBottom;
-                    }
-                });
+                allColumns.map(col => this[`${col}`].children).forEach(column => [].slice.call(column).forEach(img => heightMap[img.firstChild.title] = img.clientHeight + ( (sideMargin <= 2) ? sideMargin - 4 : sideMargin )));
 
                 // Reset height data from previous function runs.
                 heights = { avgDifference: 0, smallestCol: '' };
                 for (let i = 0; i < columns.length; i++) heights[`col${i}`] = { height: 0, imgHeight: 0 };
 
                 // Store the current height of each column by adding up image heights.
-                _columns.forEach((column, i) => {
-                    column.forEach((image, j) => {
-                        const imgHeight = heightMap[image];
-                        heights[`col${i}`].height += imgHeight;
-                        if (j === column.length - 1) heights[`col${i}`].imgHeight = imgHeight;
-                    });
-                });
+                _columns.forEach((column, i) => column.forEach((image, j) => {
+                    const imgHeight = heightMap[image];
+                    heights[`col${i}`].height += imgHeight;
+                    if (j === column.length - 1) heights[`col${i}`].imgHeight = imgHeight;
+                }));
 
                 const heightArray = Object.keys(heights).reduce((arr, col) => (heights[col].height) ? [ ...arr, heights[col].height ] : arr, []);
                 heights.avgDifference = getDiff(heightArray);

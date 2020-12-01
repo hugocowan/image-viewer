@@ -4,7 +4,7 @@ class Login extends React.Component {
 
     state = {
         loggedIn: false,
-        error: false
+        registered: false
     };
 
 
@@ -12,10 +12,10 @@ class Login extends React.Component {
         this.setState({ [name]: value });
     };
 
-    handleSubmit = e => {
+    handleSubmit = (e, type) => {
         e.preventDefault();
 
-        fetch(`${process.env.REACT_APP_API_URL}:${process.env.REACT_APP_API_PORT}/api/auth`, {
+        fetch(`${process.env.REACT_APP_API_URL}:${process.env.REACT_APP_API_PORT}/api/auth/${type}`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json, text/plain, */*',
@@ -25,19 +25,24 @@ class Login extends React.Component {
         })
         .then((res) => res.json())
         .then(data => {
-            this.setState({ loggedIn: data.loggedIn, error: data.error });
-            this.props.handleLogin(data);
+
+            if (data.registration) {
+                this.setState({ registered: true });
+            } else {
+                this.props.handleLogin(data);
+            }
+
         })
-        .catch(err => console.log('Error while logging in:', err));
+        .catch(err => console.log(type === 'login' ? 'Error while logging in:' : 'Error while registering:', err));
     };
 
     render () {
 
         return <div className="login-form">
-			<h1>Login Form</h1>
-            <p>{this.state.loggedIn || this.state.error}</p>
-
-			<form onSubmit={this.handleSubmit}>
+			<h1>Login/Register</h1>
+            <p className='error'>{this.props.error}</p>
+            {this.state.registered && <p className='registered'>Registration successful! Please login with your new credentials</p>}
+			<form onSubmit={(e) => e.preventDefault()}>
                 <input
                     type="text"
                     name="username"
@@ -52,8 +57,10 @@ class Login extends React.Component {
                     onChange={this.handleChange}
                     required
                 />
-				<input type="submit" />
+				<input onClick={e => this.handleSubmit(e, 'login')} type="submit" value="Login" />
+                <input onClick={e => this.handleSubmit(e, 'register')} type="submit" value="Register" />
 			</form>
+
 		</div>;
     }
 

@@ -1,4 +1,5 @@
 const db = require('../models/dbconnection');
+const { encrypt, decrypt } = require('../lib/crypto');
 
 function loginRoute(req, res) {
 
@@ -8,7 +9,7 @@ function loginRoute(req, res) {
     
 	if (username && password) {
 		db.query(
-            'SELECT * FROM accounts WHERE username = ? AND password = ?', [ username, password ], 
+            'SELECT * FROM accounts WHERE username = ?', [ username, password ], 
             function(error, results, fields) {
 
                 if (error) {
@@ -17,16 +18,44 @@ function loginRoute(req, res) {
                     return;
                 }
 
-                if (results.length > 0) {
+                if (results.length === 0) res.json({ loggedIn: false, error: 'Incorrect Username and/or Password!' });
 
-                    req.session.loggedIn = true;
-                    req.session.username = username;
-                    res.json({ username, id: results[0].id, loggedIn: true, error: false });
+                results.forEach((user, index) => {
 
-                } else {
+                    if (decrypt(JSON.parse(user.password)) === password) {
 
-                    res.json({ loggedIn: false, error: 'Incorrect Username and/or Password!' });
-                }			
+                        req.session.loggedIn = true;
+                        req.session.username = username;
+                        res.json({ username, hash: encrypt(results[0].id.toString()), loggedIn: true, error: false });
+
+                    } else if (index === results.length - 1) {
+
+                        res.json({ loggedIn: false, error: 'Incorrect Username and/or Password!' });
+                    }
+                });         
+            }
+        );
+	} else {
+		res.json({ loggedIn: false, error: 'Please enter Username and Password!' });
+	}
+}
+
+function registerRoute(req, res) {
+
+    const username = req.body.username,
+        password = req.body.password;
+    
+	if (username && password) {
+		db.query(
+            'INSERT INTO accounts (username, password) VALUES(?, ?)', [ username, JSON.stringify(encrypt(password)) ],
+            function(error, results, fields) {
+
+                if (error) {
+                    res.json({ loggedIn: false, error });
+                    return;
+                }
+
+                res.json({ registration: true });         
             }
         );
 	} else {
@@ -35,5 +64,6 @@ function loginRoute(req, res) {
 }
 
 module.exports = {
-    login: loginRoute
+    login: loginRoute,
+    register: registerRoute
 };

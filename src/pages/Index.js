@@ -14,6 +14,7 @@ class Index extends React.Component {
             images: null,
             fixNavbar: false,
             username: this.props.username,
+            hash: this.props.hash,
             sorting: 'shuffle',
             showSettings: false,
             sideMargin: 5,
@@ -42,7 +43,7 @@ class Index extends React.Component {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ username: this.state.username }),
+            body: JSON.stringify({ hash: this.state.hash }),
         })
             .then(res => res.json())
             .then(({ showSettings, context, sorting, columnNumber, fixNavbar, sideMargin }) => {
@@ -61,7 +62,7 @@ class Index extends React.Component {
             })
             .catch(err => this.setState({ error: err.message }));
     }
-
+    
     handleSortChange = sorting => {
 
         let images = [ ...this.state.images ];
@@ -89,18 +90,18 @@ class Index extends React.Component {
     handleColumnChange = ({ target: { value } }) => {
         const columns = [];
         for (let i = 0; i < value; i++) columns.push([]);
-        this.setState({ columns, updateNeeded: this.state.images.length > 0 ? true : false }, () => this.onSettingsChange());
+        this.setState({ columns, updateNeeded: (this.state.images.length > 0) ? true : false }, () => this.onSettingsChange());
     };
 
     onSettingsChange = () => {
-        const { apiURL, apiPORT, showSettings, context, sorting, columns, fixNavbar, username, sideMargin } = this.state;
+        const { apiURL, apiPORT, showSettings, context, sorting, columns, fixNavbar, hash, sideMargin } = this.state;
         fetch(`${apiURL}:${apiPORT}/api/settings/set`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ showSettings, context, sorting, columns: columns.length, fixNavbar, username, sideMargin: (sideMargin === '' || sideMargin > 255) ? 5 : sideMargin })
+            body: JSON.stringify({ showSettings, context, sorting, columns: columns.length, fixNavbar, hash, sideMargin: (sideMargin === '' || sideMargin > 255) ? 5 : sideMargin })
         })
             .catch(err => this.setState({ error: err.message }));
     }
@@ -159,6 +160,8 @@ class Index extends React.Component {
                     handleNavContextChange={context => this.setState({ context }, () => this.onSettingsChange())}
                     handleSideMarginChange={event => this.setState({ sideMargin: parseInt(event.target.value) }, () => this.onSettingsChange())}
                     onImageChange={images => this.onImageChange(images)}
+                    username={this.state.username}
+                    handleLogOut={this.props.handleLogOut}
                 />
                 {this.state.selectedImage &&
                 <Modal

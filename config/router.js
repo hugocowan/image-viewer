@@ -7,7 +7,8 @@ router.get('/images', images.index);
 router.post('/upload', images.upload);
 router.post('/delete', images.delete);
 
-router.post('/auth', auth.login);
+router.post('/auth/login', auth.login);
+router.post('/auth/register', auth.register);
 
 router.post('/settings/get', settings.get);
 router.post('/settings/set', settings.set);
