@@ -12,11 +12,12 @@ class Index extends React.Component {
 
         this.state = {
             images: null,
-            makeFixed: false,
+            fixNavbar: false,
             username: this.props.username,
-            sortType: 'shuffle',
-            showNav: false,
-            navContext: null,
+            sorting: 'shuffle',
+            showSettings: false,
+            sideMargin: 5,
+            context: null,
             columns: [ [], [], [] ],
             updateNeeded: false,
             error: false,
@@ -44,10 +45,10 @@ class Index extends React.Component {
             body: JSON.stringify({ username: this.state.username }),
         })
             .then(res => res.json())
-            .then(({ showNav, navContext, sortType, columnNumber, fixNavbar }) => {
+            .then(({ showSettings, context, sorting, columnNumber, fixNavbar, sideMargin }) => {
                 const columns = [];
                 for (let i = 0; i < columnNumber; i++) columns.push([]);
-                this.setState({ showNav, navContext, sortType, columns, makeFixed: fixNavbar });
+                this.setState({ showSettings, context, sorting, columns, fixNavbar, sideMargin });
 
                 fetch(`${this.state.apiURL}:${this.state.apiPORT}/api/images`, {
                     headers: {
@@ -61,11 +62,11 @@ class Index extends React.Component {
             .catch(err => this.setState({ error: err.message }));
     }
 
-    handleSortChange = sortType => {
+    handleSortChange = sorting => {
 
         let images = [ ...this.state.images ];
 
-        switch(sortType) {
+        switch(sorting) {
             case 'shuffle' :
                 images = shuffle(images);
                 break;
@@ -81,25 +82,25 @@ class Index extends React.Component {
             default: break;
         }
 
-        this.setState({ sortType, images, updateNeeded: (images.length > 0) ? true : false }, () => this.onSettingsChange());
+        this.setState({ sorting, images, updateNeeded: (images.length > 0) ? true : false }, () => this.onSettingsChange());
 
     };
 
     handleColumnChange = ({ target: { value } }) => {
         const columns = [];
         for (let i = 0; i < value; i++) columns.push([]);
-
         this.setState({ columns, updateNeeded: this.state.images.length > 0 ? true : false }, () => this.onSettingsChange());
     };
 
     onSettingsChange = () => {
-        fetch(`${this.state.apiURL}:${this.state.apiPORT}/api/settings/set`, {
+        const { apiURL, apiPORT, showSettings, context, sorting, columns, fixNavbar, username, sideMargin } = this.state;
+        fetch(`${apiURL}:${apiPORT}/api/settings/set`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ showSettings: this.state.showNav, context: this.state.navContext, sorting: this.state.sortType, columns: this.state.columns.length, fixNavbar: this.state.makeFixed, accountName: this.state.username }),
+            body: JSON.stringify({ showSettings, context, sorting, columns: columns.length, fixNavbar, username, sideMargin: (sideMargin === '' || sideMargin > 255) ? 5 : sideMargin })
         })
             .catch(err => this.setState({ error: err.message }));
     }
@@ -143,18 +144,20 @@ class Index extends React.Component {
                     apiPORT={this.state.apiPORT}
                     handleSortChange={this.handleSortChange}
                     handleColumnChange={this.handleColumnChange}
-                    sortType={this.state.sortType}
+                    sorting={this.state.sorting}
                     toggleDelete={this.toggleDelete}
                     enableDelete={this.state.enableDelete}
                     imagesForDeletion={this.state.imagesForDeletion}
                     images={this.state.images}
                     columns={this.state.columns}
-                    makeFixed={this.state.makeFixed}
-                    showNav={this.state.showNav}
-                    navContext={this.state.navContext}
-                    toggleMakeFixed={() => this.setState({ makeFixed: !this.state.makeFixed }, () => this.onSettingsChange())}
-                    toggleShowNav={() => this.setState({ showNav: this.state.navContext ? true : !this.state.showNav, navContext: (!this.state.showNav) ? this.state.navContext : null }, () => this.onSettingsChange())}
-                    handleNavContextChange={navContext => this.setState({ navContext }, () => this.onSettingsChange())}
+                    fixNavbar={this.state.fixNavbar}
+                    showSettings={this.state.showSettings}
+                    context={this.state.context}
+                    sideMargin={this.state.sideMargin}
+                    toggleMakeFixed={() => this.setState({ fixNavbar: !this.state.fixNavbar }, () => this.onSettingsChange())}
+                    toggleShowSettings={() => this.setState({ showSettings: this.state.context ? true : !this.state.showSettings, context: (!this.state.showSettings) ? this.state.context : null }, () => this.onSettingsChange())}
+                    handleNavContextChange={context => this.setState({ context }, () => this.onSettingsChange())}
+                    handleSideMarginChange={event => this.setState({ sideMargin: parseInt(event.target.value) }, () => this.onSettingsChange())}
                     onImageChange={images => this.onImageChange(images)}
                 />
                 {this.state.selectedImage &&
@@ -168,11 +171,12 @@ class Index extends React.Component {
                     onClick ={() => this.setState({ selectedImage: '' })}
                 />}
                 <ImageRender
-                    makeFixed={this.state.makeFixed}
+                    fixNavbar={this.state.fixNavbar}
                     apiURL={this.state.apiURL}
                     apiPORT={this.state.apiPORT}
                     images={this.state.images}
                     columns={this.state.columns}
+                    sideMargin={this.state.sideMargin}
                     handleSelectedImage={src => this.handleSelectedImage(src)}
                     imagesForDeletion={this.state.imagesForDeletion}
                     updateNeeded={this.state.updateNeeded}

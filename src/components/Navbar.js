@@ -8,9 +8,9 @@ class Navbar extends React.Component {
 
     renderBurger = () => {
         return <div
-                className={`burger ${this.props.showNav} context-${!!this.props.navContext}`}
-                onClick={() => this.props.toggleShowNav()}
-            >
+                className={`burger ${this.props.showSettings} context-${!!this.props.context}`}
+                onClick={() => this.props.toggleShowSettings()}
+        >
             <div />
             <div />
             <div />
@@ -62,11 +62,11 @@ class Navbar extends React.Component {
     render() {
 
         const {
-            handleSortChange, handleColumnChange, handleNavContextChange,
-            sortType,
+            handleSortChange, handleNavContextChange,
+            sorting, sideMargin,
             enableDelete, toggleDelete,
             imagesForDeletion, columns,
-            makeFixed, toggleMakeFixed
+            fixNavbar, toggleMakeFixed
         } = this.props;
 
         const columnSizes = [];
@@ -76,12 +76,12 @@ class Navbar extends React.Component {
         }
 
         return (
-            <nav className={`${makeFixed || enableDelete}`}>
+            <nav className={`${fixNavbar || enableDelete}`}>
                 <this.renderBurger />
-                {this.props.showNav &&
+                {this.props.showSettings &&
                     <ul>
 
-                        {this.props.navContext === null &&
+                        {this.props.context === null &&
                         <div>
                             <li
                                 onClick={() => handleNavContextChange('sorting')}
@@ -94,37 +94,34 @@ class Navbar extends React.Component {
                                 Files
                             </li>
                             <li
-                                
+                                onClick={() => handleNavContextChange('columns')}
                             >
-                                <label htmlFor='column-sizes'>Columns</label>
-                                <select id='column-sizes' value={columns.length} onChange={handleColumnChange}>
-                                    {columnSizes.map(size => <option key={size} value={size}>{size}</option>)}
-                                </select>
+                                Columns
                             </li>
                             <li
-                                className={`${makeFixed}`}
+                                className={`${fixNavbar}`}
                                 onClick={toggleMakeFixed}
                             >
                                 Fix Navbar
                             </li>
                         </div>}
 
-                        {this.props.navContext === 'sorting' &&
+                        {this.props.context === 'sorting' &&
                         <div>
                             <li
-                            className={`${sortType === 'shuffle'}`}
+                            className={`${sorting === 'shuffle'}`}
                             onClick={() => handleSortChange('shuffle')}
                             >
                                 Shuffle
                             </li>
                             <li
-                                className={`${sortType === 'natural'}`}
+                                className={`${sorting === 'natural'}`}
                                 onClick={() => handleSortChange('natural')}
                             >
                                 Natural
                             </li>
                             <li
-                                className={`${sortType === 'naturalReverse'}`}
+                                className={`${sorting === 'naturalReverse'}`}
                                 onClick={() => handleSortChange('naturalReverse')}
                             >
                                 Natural Reverse
@@ -132,7 +129,7 @@ class Navbar extends React.Component {
                         </div>
                         }
 
-                        {this.props.navContext === 'files' &&
+                        {this.props.context === 'files' &&
                         <div>
                             <li>
                                 <label htmlFor="file-upload" className="custom-file-upload">Upload</label>
@@ -159,6 +156,35 @@ class Navbar extends React.Component {
                                 {!enableDelete && 'Enable Deleting'}
                                 {enableDelete && 'Disable Deleting'}
                             </li>
+                        </div>}
+
+                        {this.props.context === 'columns' &&
+                        <div>
+                            <li>
+                                <label htmlFor='column-number'>Number</label>
+                                <input 
+                                    id="column-number"
+                                    type="number"
+                                    name="column-number"
+                                    max="255"
+                                    min="1"
+                                    value={columns.length}
+                                    onChange={this.props.handleColumnChange}
+                                />
+                            </li>
+                            <li>
+                                <label htmlFor='side-margin'>Margin</label>
+                                <input 
+                                    id="side-margin"
+                                    type="number"
+                                    name="side-margin"
+                                    max="255"
+                                    min="0"
+                                    value={sideMargin}
+                                    onChange={this.props.handleSideMarginChange}
+                                />
+                            </li>
+                            
                         </div>}
 
                     </ul>}

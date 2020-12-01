@@ -7,11 +7,11 @@ class ImageRender extends React.Component {
 
         this.state = {
             columns: this.splitImages(props.columns, props.images),
-            sorting: false,
+            currentlySorting: false,
             sorted: false,
             loadedImages: 0,
             firstTime: true,
-            sortType: props.sortType,
+            sorting: props.sorting,
         };
 
         // Use the observer to keep track of each image's location
@@ -23,7 +23,7 @@ class ImageRender extends React.Component {
         if (!this.props.updateNeeded) return;
         this.props.updateDone();
 
-        this.setState({ columns: this.splitImages(this.props.columns, this.props.images), sortType: this.props.sortType }, () =>
+        this.setState({ columns: this.splitImages(this.props.columns, this.props.images), sorting: this.props.sorting }, () =>
             this.onImgLoad({ target: false }, true));
     }
 
@@ -45,19 +45,19 @@ class ImageRender extends React.Component {
     */
     onImgLoad = ({ target }, override = false) => {
 
-        let { loadedImages, sorting, sorted, columns } = this.state, { images } = this.props;
+        let { loadedImages, currentlySorting, sorted, columns } = this.state, { images } = this.props;
 
         // Add images to the observer as their onload functions fire.
         if (target) this.observer.observe(target);
 
         // If images are already sorted, don't run this again.
-        if ((override === false && sorting) || (override === false && sorted)) return;
+        if ((override === false && currentlySorting) || (override === false && sorted)) return;
 
         
         // Only run sorting when all images have loaded.
         if (override || loadedImages >= images.length) {
 
-            this.setState({ sorting: true });
+            this.setState({ currentlySorting: true });
 
             let heights = {}, bestMove = undefined, checkColumns, allColumns = [];
             
@@ -141,8 +141,10 @@ class ImageRender extends React.Component {
                 calcHeights(allColumns.map(col => this[`_${col}`]));
             };
 
-            checkColumns = () => new Promise(resolve => setTimeout(resolve, 200))
+            checkColumns = (columnNumber) => new Promise(resolve => setTimeout(resolve, 200))
                 .then(() => {
+
+                    if (columnNumber !== this.state.columns.length) throw new Error('Column number has changed since this function was called.');
 
                     const oldHeights = JSON.stringify(heights);
                     calcHeights(columns);
@@ -151,7 +153,7 @@ class ImageRender extends React.Component {
                 .then(bool => {
 
                     if (bool === false) {
-                        checkColumns();
+                        checkColumns(columnNumber);
                         return;
                     }
 
@@ -162,54 +164,43 @@ class ImageRender extends React.Component {
                     // Set state with the finalised column arrays.
                     this.setState({
                         columns: allColumns.map(col => this[`_${col}`]),
-                        loadedImages: loadedImages + 1, sorting: false, sorted: true
+                        loadedImages: loadedImages + 1, currentlySorting: false, sorted: true
                     });
-                });
+                })
+                .catch(err => console.log(err));
 
             calcHeights(columns);
-            checkColumns();
+            checkColumns(columns.length);
 
         } else if (loadedImages < images.length) this.setState({ loadedImages: loadedImages + 1 });
     };
 
     // When an image enters/leaves the viewport, set the src to be thumbnail/full image
-    handleIntersection = entries => entries.forEach(entry => {
-        
-        const filename = entry.target.alt.replace('From ', '');
-        let src = `${this.props.apiURL}:${this.props.apiPORT}/media/`, bigImage = entry.target.clientWidth > 230;
-
-        if (entry.isIntersecting) {
-
-            const filename = entry.target.alt.replace('From ', '');
-            src += bigImage && entry.target.src.includes('/thumbnails/') ? `${filename}` :
-                !bigImage && filename.includes('.gif') ? `thumbnails/live-${filename}` :
-                `thumbnails/${filename}`;
-
-        } else {
-
-            src += bigImage && entry.target.src.match(/live-.*gif/) !== null ?
-                `thumbnails/live-${filename}` : `thumbnails/${filename}`;
-        }
-
-        entry.target.src = src;
-    });
+    handleIntersection = entries => entries.forEach(entry => entry.target.src = `${this.props.apiURL}:${this.props.apiPORT}/media/` + ( 
+        (entry.isIntersecting && (entry.target.clientWidth > 230) && entry.target.src.includes('/thumbnails/')) ? '' : 
+        (
+            (entry.isIntersecting && (entry.target.clientWidth <= 230) && entry.target.src.match(/live-.*gif/)) || 
+            (!entry.isIntersecting && (entry.target.clientWidth > 230) && entry.target.alt.includes('.gif'))
+        ) ? 'thumbnails/live-' : 'thumbnails/'
+    ) + entry.target.alt.replace('From ', ''));
 
     render() {
+
+        const sideMargin = ('' === this.props.sideMargin) ? 5 : this.props.sideMargin;
+
         return (
-            <div className={`main ${this.props.makeFixed}`}>
+            <div className={`main ${this.props.fixNavbar}`}>
                 <div className='img-container'>
                     {this.state.columns.map((col, i) => {
-                        return <div key={i} className='img-wrapper' ref={c => this[`col${i}`] = c} style={{width: 'calc(' + 100 / this.state.columns.length + '% - 10px'}}>
+                        return <div key={i} className='img-wrapper' ref={c => this[`col${i}`] = c} style={{ marginLeft: sideMargin + 'px', marginRight: sideMargin + 'px', width: 'calc(' + 100 / this.state.columns.length + '% - ' + sideMargin * 2 + 'px' }}>
                             {col.map(imageLink =>
                             <div
                                 className={`image ${imageLink} ${this.props.imagesForDeletion.includes(imageLink)}`}
-                                alt={`From ${imageLink}`}
-                                key={imageLink}
+                                style={{ marginBottom: (sideMargin <= 2) ? sideMargin - 4 : sideMargin  + 'px' }}
+                                alt={`From ${imageLink}`} key={imageLink}
                             >
                                 <img
-                                    onLoad={this.onImgLoad}
-                                    title={imageLink}
-                                    alt={`From ${imageLink}`}
+                                    onLoad={this.onImgLoad} title={imageLink} alt={`From ${imageLink}`}
                                     src={`${this.props.apiURL}:${this.props.apiPORT}/media/thumbnails/${imageLink}`}
                                     onClick ={() => this.props.handleSelectedImage(imageLink)}
                                 />
