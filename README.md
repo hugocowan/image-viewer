@@ -12,7 +12,9 @@ A giphy-style image viewer. Add your images and keep your own local image file s
 
 * Open a command line, navigate to the project root directory. 
 
-* Type `node server`
+* Type `npm install`, hit enter.
+
+* Type `node server`, hit enter.
 
 * Open up another command line at the project dir, type `npm start`
 
