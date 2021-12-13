@@ -182,13 +182,13 @@ const ImageRenderWithHooks = function(props) {
             if (!props.updateNeeded) return;
             props.updateDone();
     
-            console.log('before:', columns, sortType);
+            console.log('before:', columns, props.columns);
             setColumns(splitImages(props.columns, props.images)) 
             setSortType(props.sortType);
             console.log('after:', columns, sortType);
     
-            onImgLoad({ target: false }, true);
-        }, [props, columns, sortType, onImgLoad]);
+            if (columnHTML[0])onImgLoad({ target: false }, true);
+        }, [props, columns, sortType, onImgLoad, columnHTML]);
 
         return (
             <div className={`main ${props.makeFixed}`}>

@@ -3,7 +3,7 @@ import { shuffle, naturalSort } from '../lib/Sort';
 import '../App.scss';
 const Modal = React.lazy(() => import('../components/Modal'));
 const Navbar = React.lazy(() => import('../components/Navbar'));
-const ImageRender = React.lazy(() => import('../components/ImageRenderWithHooks'));
+const ImageRender = React.lazy(() => import('../components/ImageRender'));
 
 class Index extends React.Component {
 
