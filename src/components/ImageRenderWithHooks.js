@@ -146,7 +146,7 @@ const ImageRenderWithHooks = function(props) {
                     calcHeights(allColumns.map(colIndex => colFileNames[colIndex]));
                 };
     
-                checkColumns = () => new Promise(resolve => setTimeout(resolve, 200))
+                const checkColumns = () => new Promise(resolve => setTimeout(resolve, 200))
                     .then(() => {
     
                         const oldHeights = JSON.stringify(heights);
@@ -183,7 +183,7 @@ const ImageRenderWithHooks = function(props) {
             props.updateDone();
     
             console.log('before:', columns, props.columns);
-            setColumns(splitImages(props.columns, props.images)) 
+            setColumns(splitImages(props.columns, props.images));
             setSortType(props.sortType);
             console.log('after:', columns, sortType);
     
